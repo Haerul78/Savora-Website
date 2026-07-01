@@ -1,8 +1,15 @@
 import AppLayout from '@/Layouts/AppLayout';
+import CategoryChips from '@/Components/CategoryChips';
 import { usePage } from '@inertiajs/react';
+import { useState } from 'react';
 
 export default function Home() {
     const { auth, recipes, categories, products } = usePage().props;
+    const [activeCategory, setActiveCategory] = useState(null);
+
+    const filteredRecipes = activeCategory
+        ? recipes.filter(r => r.category === activeCategory)
+        : recipes;
 
     return (
         <AppLayout>
@@ -17,19 +24,14 @@ export default function Home() {
                     </p>
                 </section>
 
-                {/* Category Chips — placeholder */}
+                {/* Category Chips */}
                 <section className="space-y-3">
                     <h2 className="text-base font-semibold text-on-surface">Kategori</h2>
-                    <div className="flex gap-2 flex-wrap">
-                        {categories.map(cat => (
-                            <span
-                                key={cat}
-                                className="px-4 py-1.5 rounded-full text-sm bg-surface-high text-on-surface-variant border border-outline-variant"
-                            >
-                                {cat}
-                            </span>
-                        ))}
-                    </div>
+                    <CategoryChips
+                        categories={categories}
+                        active={activeCategory}
+                        onChange={setActiveCategory}
+                    />
                 </section>
 
                 {/* Rekomendasi Resep — placeholder grid */}
@@ -41,7 +43,7 @@ export default function Home() {
                         </a>
                     </div>
                     <div className="grid grid-cols-2 xl:grid-cols-4 gap-4">
-                        {recipes.map(recipe => (
+                        {filteredRecipes.map(recipe => (
                             <div
                                 key={recipe.id}
                                 className="bg-surface-low rounded-2xl overflow-hidden border border-outline-variant"
