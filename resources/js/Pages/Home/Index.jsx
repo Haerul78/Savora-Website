@@ -2,7 +2,7 @@ import AppLayout from '@/Layouts/AppLayout';
 import CategoryChips from '@/Components/CategoryChips';
 import RecipeCard from '@/Components/RecipeCard';
 import ProductCard from '@/Components/ProductCard';
-import { usePage } from '@inertiajs/react';
+import { usePage, Link } from '@inertiajs/react';
 import { useState } from 'react';
 
 export default function Home() {
@@ -15,7 +15,7 @@ export default function Home() {
 
     return (
         <AppLayout>
-            <div className="space-y-10">
+            <div className="space-y-10 pb-10">
                 {/* Greeting */}
                 <section>
                     <h1 className="text-2xl font-bold text-on-surface">
@@ -36,13 +36,13 @@ export default function Home() {
                     />
                 </section>
 
-                {/* Rekomendasi Resep — placeholder grid */}
+                {/* Rekomendasi Resep */}
                 <section className="space-y-4">
                     <div className="flex items-center justify-between">
                         <h2 className="text-base font-semibold text-on-surface">Rekomendasi Resep</h2>
-                        <a href="/recipes" className="text-sm text-primary font-medium hover:underline">
+                        <Link href="/recipes" className="text-sm text-primary font-medium hover:underline">
                             Lihat semua
-                        </a>
+                        </Link>
                     </div>
                     {filteredRecipes.length > 0 ? (
                         <div className="grid grid-cols-2 xl:grid-cols-4 gap-4">
@@ -51,19 +51,21 @@ export default function Home() {
                             ))}
                         </div>
                     ) : (
-                        <p className="text-sm text-on-surface-variant py-8 text-center">
+                        <p className="text-sm text-on-surface-variant py-10 text-center">
                             Belum ada resep untuk kategori ini.
                         </p>
                     )}
                 </section>
 
-                {/* Bahan Segar — placeholder grid */}
+                <hr className="border-outline-variant" />
+
+                {/* Bahan Segar */}
                 <section className="space-y-4">
                     <div className="flex items-center justify-between">
                         <h2 className="text-base font-semibold text-on-surface">Bahan Segar</h2>
-                        <a href="/store" className="text-sm text-primary font-medium hover:underline">
+                        <Link href="/store" className="text-sm text-primary font-medium hover:underline">
                             Lihat toko
-                        </a>
+                        </Link>
                     </div>
                     {products.length > 0 ? (
                         <div className="grid grid-cols-2 xl:grid-cols-4 gap-4">
@@ -72,7 +74,7 @@ export default function Home() {
                             ))}
                         </div>
                     ) : (
-                        <p className="text-sm text-on-surface-variant py-8 text-center">
+                        <p className="text-sm text-on-surface-variant py-10 text-center">
                             Belum ada produk tersedia.
                         </p>
                     )}

@@ -40,63 +40,67 @@ export default function RecipeIndex() {
         <AppLayout>
             <div className="flex gap-6">
                 {/* Filter Panel */}
-                <aside className="w-52 shrink-0 space-y-6">
-                    <div className="flex items-center justify-between">
-                        <h2 className="text-sm font-semibold text-on-surface">Filter</h2>
-                        {hasFilter && (
-                            <button
-                                onClick={clearFilters}
-                                className="text-xs text-primary hover:underline"
-                            >
-                                Reset
-                            </button>
-                        )}
-                    </div>
+                <aside className="w-52 shrink-0">
+                    <div className="bg-surface-low border border-outline-variant rounded-2xl p-4 space-y-5 sticky top-4">
+                        <div className="flex items-center justify-between">
+                            <h2 className="text-sm font-semibold text-on-surface">Filter</h2>
+                            {hasFilter && (
+                                <button
+                                    onClick={clearFilters}
+                                    className="text-xs text-primary hover:underline"
+                                >
+                                    Reset
+                                </button>
+                            )}
+                        </div>
 
-                    {/* Kategori */}
-                    <div className="space-y-2">
-                        <p className="text-xs font-semibold text-on-surface-variant uppercase tracking-wide">
-                            Kategori
-                        </p>
-                        <ul className="space-y-1">
-                            {categories.map(cat => (
-                                <li key={cat}>
-                                    <button
-                                        onClick={() => setFilter('category', filters.category === cat ? '' : cat)}
-                                        className={`w-full text-left text-sm px-3 py-1.5 rounded-xl transition ${
-                                            filters.category === cat
-                                                ? 'bg-primary text-white font-medium'
-                                                : 'text-on-surface-variant hover:bg-surface-high'
-                                        }`}
-                                    >
-                                        {cat}
-                                    </button>
-                                </li>
-                            ))}
-                        </ul>
-                    </div>
+                        {/* Kategori */}
+                        <div className="space-y-2">
+                            <p className="text-xs font-semibold text-on-surface-variant uppercase tracking-wide">
+                                Kategori
+                            </p>
+                            <ul className="space-y-0.5">
+                                {categories.map(cat => (
+                                    <li key={cat}>
+                                        <button
+                                            onClick={() => setFilter('category', filters.category === cat ? '' : cat)}
+                                            className={`w-full text-left text-sm px-3 py-1.5 rounded-xl transition ${
+                                                filters.category === cat
+                                                    ? 'bg-primary text-white font-medium'
+                                                    : 'text-on-surface-variant hover:bg-surface-high'
+                                            }`}
+                                        >
+                                            {cat}
+                                        </button>
+                                    </li>
+                                ))}
+                            </ul>
+                        </div>
 
-                    {/* Tingkat Kesulitan */}
-                    <div className="space-y-2">
-                        <p className="text-xs font-semibold text-on-surface-variant uppercase tracking-wide">
-                            Kesulitan
-                        </p>
-                        <ul className="space-y-1">
-                            {difficulties.map(d => (
-                                <li key={d}>
-                                    <button
-                                        onClick={() => setFilter('difficulty', filters.difficulty === d ? '' : d)}
-                                        className={`w-full text-left text-sm px-3 py-1.5 rounded-xl capitalize transition ${
-                                            filters.difficulty === d
-                                                ? 'bg-primary text-white font-medium'
-                                                : 'text-on-surface-variant hover:bg-surface-high'
-                                        }`}
-                                    >
-                                        {d}
-                                    </button>
-                                </li>
-                            ))}
-                        </ul>
+                        <hr className="border-outline-variant" />
+
+                        {/* Tingkat Kesulitan */}
+                        <div className="space-y-2">
+                            <p className="text-xs font-semibold text-on-surface-variant uppercase tracking-wide">
+                                Kesulitan
+                            </p>
+                            <ul className="space-y-0.5">
+                                {difficulties.map(d => (
+                                    <li key={d}>
+                                        <button
+                                            onClick={() => setFilter('difficulty', filters.difficulty === d ? '' : d)}
+                                            className={`w-full text-left text-sm px-3 py-1.5 rounded-xl capitalize transition ${
+                                                filters.difficulty === d
+                                                    ? 'bg-primary text-white font-medium'
+                                                    : 'text-on-surface-variant hover:bg-surface-high'
+                                            }`}
+                                        >
+                                            {d}
+                                        </button>
+                                    </li>
+                                ))}
+                            </ul>
+                        </div>
                     </div>
                 </aside>
 
