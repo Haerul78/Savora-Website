@@ -1,46 +1,38 @@
 <?php
 
+use App\Http\Controllers\AuthController;
 use Illuminate\Support\Facades\Route;
 use Inertia\Inertia;
 
-Route::get('/', function () {
-    return view('welcome');
+// ─── Guest routes (hanya bisa diakses jika belum login) ───────────────────────
+Route::middleware('guest')->group(function () {
+    Route::get('/login', [AuthController::class, 'showLogin'])->name('login');
+    Route::post('/login', [AuthController::class, 'login']);
+    Route::get('/register', [AuthController::class, 'showRegister'])->name('register');
+    Route::post('/register', [AuthController::class, 'register']);
 });
 
-Route::get('/supabase-test', function () {
-    return Inertia::render('SupabaseTest');
-});
+// ─── Protected routes (butuh login via Supabase) ──────────────────────────────
+Route::middleware('supabase.auth')->group(function () {
+    Route::post('/logout', [AuthController::class, 'logout'])->name('logout');
 
-Route::get('/midtrans-test', function () {
-    return Inertia::render('MidtransTest');
-});
+    // Home
+    Route::get('/', fn () => Inertia::render('Home/Index'))->name('home');
 
-Route::get('/layout-test', function () {
-    return Inertia::render('LayoutTest');
-});
+    // Resep
+    Route::get('/recipes', fn () => Inertia::render('Recipe/Index'))->name('recipes.index');
+    Route::get('/recipes/{slug}', fn ($slug) => Inertia::render('Recipe/Show', ['slug' => $slug]))->name('recipes.show');
 
-Route::post('/midtrans-test/ping', function () {
-    \Midtrans\Config::$serverKey = env('MIDTRANS_SERVER_KEY');
-    \Midtrans\Config::$isProduction = false;
-    \Midtrans\Config::$isSanitized = true;
-    \Midtrans\Config::$is3ds = true;
-    \Midtrans\Config::$curlOptions = [CURLOPT_SSL_VERIFYPEER => false, CURLOPT_HTTPHEADER => []];
+    // Toko
+    Route::get('/store', fn () => Inertia::render('Store/Index'))->name('store.index');
 
-    $params = [
-        'transaction_details' => [
-            'order_id'     => 'test-' . time(),
-            'gross_amount' => 10000,
-        ],
-        'customer_details' => [
-            'first_name' => 'Test',
-            'email'      => 'test@savora.com',
-        ],
-    ];
+    // Keranjang
+    Route::get('/cart', fn () => Inertia::render('Cart/Index'))->name('cart.index');
 
-    try {
-        $snapToken = \Midtrans\Snap::getSnapToken($params);
-        return response()->json(['success' => true, 'snap_token' => $snapToken]);
-    } catch (\Exception $e) {
-        return response()->json(['success' => false, 'error' => $e->getMessage()], 500);
-    }
+    // Checkout
+    Route::get('/checkout/payment', fn () => Inertia::render('Checkout/Payment'))->name('checkout.payment');
+    Route::get('/checkout/success', fn () => Inertia::render('Checkout/Success'))->name('checkout.success');
+
+    // Profil
+    Route::get('/profile', fn () => Inertia::render('Profile/Index'))->name('profile.index');
 });
