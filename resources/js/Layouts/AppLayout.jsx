@@ -59,9 +59,9 @@ export default function AppLayout({ children }) {
     return (
         <div className="flex min-h-screen bg-surface">
             {/* Sidebar */}
-            <aside className="fixed top-0 left-0 h-screen w-64 bg-surface-lowest border-r border-outline-variant flex flex-col z-40">
+            <aside className="fixed top-0 left-0 h-screen w-64 bg-white/70 backdrop-blur-xl border-r border-white/40 shadow-lg flex flex-col z-40">
                 {/* Logo */}
-                <div className="px-6 py-5 border-b border-outline-variant">
+                <div className="px-6 py-5 border-b border-white/40">
                     <Link href="/" className="flex items-center gap-2">
                         <div className="w-8 h-8 rounded-lg bg-primary flex items-center justify-center">
                             <span className="text-white font-bold text-sm">S</span>
@@ -98,7 +98,7 @@ export default function AppLayout({ children }) {
 
                 {/* User Info */}
                 {user && (
-                    <div className="px-3 py-4 border-t border-outline-variant">
+                    <div className="px-3 py-4 border-t border-white/40">
                         <div className="flex items-center gap-3 px-3 py-2">
                             {user.avatar_url ? (
                                 <img src={user.avatar_url} alt={user.full_name} className="w-8 h-8 rounded-full object-cover" />
@@ -121,7 +121,7 @@ export default function AppLayout({ children }) {
             {/* Main Area */}
             <div className="flex-1 ml-64 flex flex-col">
                 {/* Navbar */}
-                <header className="sticky top-0 z-30 bg-surface-lowest border-b border-outline-variant">
+                <header className="sticky top-0 z-30 bg-white/70 backdrop-blur-xl border-b border-white/40 shadow-sm">
                     <div className="flex items-center gap-4 px-6 h-16">
                         {/* Search */}
                         <div className="flex-1 max-w-md">
