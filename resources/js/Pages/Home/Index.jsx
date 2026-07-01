@@ -1,5 +1,6 @@
 import AppLayout from '@/Layouts/AppLayout';
 import CategoryChips from '@/Components/CategoryChips';
+import RecipeCard from '@/Components/RecipeCard';
 import { usePage } from '@inertiajs/react';
 import { useState } from 'react';
 
@@ -42,37 +43,17 @@ export default function Home() {
                             Lihat semua
                         </a>
                     </div>
-                    <div className="grid grid-cols-2 xl:grid-cols-4 gap-4">
-                        {filteredRecipes.map(recipe => (
-                            <div
-                                key={recipe.id}
-                                className="bg-surface-low rounded-2xl overflow-hidden border border-outline-variant"
-                            >
-                                {recipe.image_url ? (
-                                    <img
-                                        src={recipe.image_url}
-                                        alt={recipe.title}
-                                        className="w-full h-36 object-cover"
-                                    />
-                                ) : (
-                                    <div className="w-full h-36 bg-surface-high flex items-center justify-center text-on-surface-variant text-xs">
-                                        No Image
-                                    </div>
-                                )}
-                                <div className="p-3 space-y-1">
-                                    <p className="text-sm font-semibold text-on-surface line-clamp-1">
-                                        {recipe.title}
-                                    </p>
-                                    <p className="text-xs text-on-surface-variant">
-                                        {recipe.cook_time_minutes} menit · {recipe.difficulty}
-                                    </p>
-                                    <p className="text-xs text-primary font-medium">
-                                        ★ {recipe.rating} ({recipe.total_reviews})
-                                    </p>
-                                </div>
-                            </div>
-                        ))}
-                    </div>
+                    {filteredRecipes.length > 0 ? (
+                        <div className="grid grid-cols-2 xl:grid-cols-4 gap-4">
+                            {filteredRecipes.map(recipe => (
+                                <RecipeCard key={recipe.id} recipe={recipe} />
+                            ))}
+                        </div>
+                    ) : (
+                        <p className="text-sm text-on-surface-variant py-8 text-center">
+                            Belum ada resep untuk kategori ini.
+                        </p>
+                    )}
                 </section>
 
                 {/* Bahan Segar — placeholder grid */}
