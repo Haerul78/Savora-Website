@@ -6,9 +6,9 @@ use Illuminate\Support\Facades\Http;
 
 class SupabaseService
 {
-    private string $url;
-    private string $anonKey;
-    private string $serviceRole;
+    private ?string $url;
+    private ?string $anonKey;
+    private ?string $serviceRole;
 
     public function __construct()
     {
