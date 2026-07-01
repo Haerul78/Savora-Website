@@ -2,6 +2,7 @@
 
 use App\Http\Controllers\AuthController;
 use App\Http\Controllers\HomeController;
+use App\Http\Controllers\RecipeController;
 use Illuminate\Support\Facades\Route;
 use Inertia\Inertia;
 
@@ -21,7 +22,7 @@ Route::middleware('supabase.auth')->group(function () {
     Route::get('/', [HomeController::class, 'index'])->name('home');
 
     // Resep
-    Route::get('/recipes', fn () => Inertia::render('Recipe/Index'))->name('recipes.index');
+    Route::get('/recipes', [RecipeController::class, 'index'])->name('recipes.index');
     Route::get('/recipes/{slug}', fn ($slug) => Inertia::render('Recipe/Show', ['slug' => $slug]))->name('recipes.show');
 
     // Toko
