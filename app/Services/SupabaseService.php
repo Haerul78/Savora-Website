@@ -17,12 +17,24 @@ class SupabaseService
         $this->serviceRole = config('supabase.service_role');
     }
 
+    private function http()
+    {
+        $client = Http::withHeaders([
+            'apikey'       => $this->anonKey,
+            'Content-Type' => 'application/json',
+        ]);
+
+        // Disable SSL verification on local dev only
+        if (app()->environment('local')) {
+            $client = $client->withoutVerifying();
+        }
+
+        return $client;
+    }
+
     public function signIn(string $email, string $password): array
     {
-        $response = Http::withHeaders([
-            'apikey'        => $this->anonKey,
-            'Content-Type'  => 'application/json',
-        ])->post("{$this->url}/auth/v1/token?grant_type=password", [
+        $response = $this->http()->post("{$this->url}/auth/v1/token?grant_type=password", [
             'email'    => $email,
             'password' => $password,
         ]);
@@ -32,10 +44,7 @@ class SupabaseService
 
     public function signUp(string $email, string $password, array $data = []): array
     {
-        $response = Http::withHeaders([
-            'apikey'        => $this->anonKey,
-            'Content-Type'  => 'application/json',
-        ])->post("{$this->url}/auth/v1/signup", [
+        $response = $this->http()->post("{$this->url}/auth/v1/signup", [
             'email'    => $email,
             'password' => $password,
             'data'     => $data,
@@ -46,19 +55,17 @@ class SupabaseService
 
     public function getUser(string $accessToken): array
     {
-        $response = Http::withHeaders([
-            'apikey'        => $this->anonKey,
-            'Authorization' => "Bearer {$accessToken}",
-        ])->get("{$this->url}/auth/v1/user");
+        $response = $this->http()
+            ->withToken($accessToken)
+            ->get("{$this->url}/auth/v1/user");
 
         return $response->json();
     }
 
     public function signOut(string $accessToken): void
     {
-        Http::withHeaders([
-            'apikey'        => $this->anonKey,
-            'Authorization' => "Bearer {$accessToken}",
-        ])->post("{$this->url}/auth/v1/logout");
+        $this->http()
+            ->withToken($accessToken)
+            ->post("{$this->url}/auth/v1/logout");
     }
 }
