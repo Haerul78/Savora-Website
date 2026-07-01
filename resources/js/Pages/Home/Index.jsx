@@ -1,6 +1,7 @@
 import AppLayout from '@/Layouts/AppLayout';
 import CategoryChips from '@/Components/CategoryChips';
 import RecipeCard from '@/Components/RecipeCard';
+import ProductCard from '@/Components/ProductCard';
 import { usePage } from '@inertiajs/react';
 import { useState } from 'react';
 
@@ -64,37 +65,17 @@ export default function Home() {
                             Lihat toko
                         </a>
                     </div>
-                    <div className="grid grid-cols-2 xl:grid-cols-4 gap-4">
-                        {products.map(product => (
-                            <div
-                                key={product.id}
-                                className="bg-surface-low rounded-2xl overflow-hidden border border-outline-variant"
-                            >
-                                {product.image_url ? (
-                                    <img
-                                        src={product.image_url}
-                                        alt={product.name}
-                                        className="w-full h-28 object-cover"
-                                    />
-                                ) : (
-                                    <div className="w-full h-28 bg-surface-high flex items-center justify-center text-on-surface-variant text-xs">
-                                        No Image
-                                    </div>
-                                )}
-                                <div className="p-3 space-y-1">
-                                    <p className="text-sm font-semibold text-on-surface line-clamp-1">
-                                        {product.name}
-                                    </p>
-                                    <p className="text-xs text-on-surface-variant">
-                                        {product.category?.name} · per {product.unit}
-                                    </p>
-                                    <p className="text-sm font-bold text-primary">
-                                        Rp {Number(product.price).toLocaleString('id-ID')}
-                                    </p>
-                                </div>
-                            </div>
-                        ))}
-                    </div>
+                    {products.length > 0 ? (
+                        <div className="grid grid-cols-2 xl:grid-cols-4 gap-4">
+                            {products.map(product => (
+                                <ProductCard key={product.id} product={product} />
+                            ))}
+                        </div>
+                    ) : (
+                        <p className="text-sm text-on-surface-variant py-8 text-center">
+                            Belum ada produk tersedia.
+                        </p>
+                    )}
                 </section>
             </div>
         </AppLayout>
