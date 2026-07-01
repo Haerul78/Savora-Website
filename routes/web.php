@@ -5,7 +5,7 @@ use Illuminate\Support\Facades\Route;
 use Inertia\Inertia;
 
 // ─── Guest routes (hanya bisa diakses jika belum login) ───────────────────────
-Route::middleware('guest')->group(function () {
+Route::middleware('supabase.guest')->group(function () {
     Route::get('/login', [AuthController::class, 'showLogin'])->name('login');
     Route::post('/login', [AuthController::class, 'login']);
     Route::get('/register', [AuthController::class, 'showRegister'])->name('register');

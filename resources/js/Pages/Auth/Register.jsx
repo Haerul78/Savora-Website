@@ -1,5 +1,5 @@
 import { useForm, usePage, Link } from '@inertiajs/react';
-import { useState } from 'react';
+import { useState, useEffect } from 'react';
 
 function PasswordStrength({ password }) {
     const checks = [
@@ -44,6 +44,8 @@ function PasswordStrength({ password }) {
 export default function Register() {
     const { errors } = usePage().props;
     const [agreed, setAgreed] = useState(false);
+    const [touched, setTouched] = useState({});
+    const [passwordMismatch, setPasswordMismatch] = useState(false);
 
     const { data, setData, post, processing } = useForm({
         full_name:              '',
@@ -52,8 +54,30 @@ export default function Register() {
         password_confirmation:  '',
     });
 
+    useEffect(() => {
+        if (data.password_confirmation) {
+            setPasswordMismatch(data.password !== data.password_confirmation);
+        }
+    }, [data.password, data.password_confirmation]);
+
+    function touch(field) {
+        setTouched(prev => ({ ...prev, [field]: true }));
+    }
+
+    function fieldClass(field, extra = '') {
+        const isEmpty = touched[field] && !data[field];
+        const hasError = errors[field];
+        return `w-full px-4 py-2.5 text-sm rounded-xl border bg-surface-lowest text-on-surface placeholder-on-surface-variant focus:outline-none focus:ring-2 transition ${extra} ${
+            hasError || isEmpty
+                ? 'border-red-400 focus:ring-red-200'
+                : 'border-outline-variant focus:border-primary focus:ring-primary/30'
+        }`;
+    }
+
     function submit(e) {
         e.preventDefault();
+        setTouched({ full_name: true, email: true, password: true, password_confirmation: true });
+        if (passwordMismatch) return;
         post('/register');
     }
 
@@ -108,11 +132,13 @@ export default function Register() {
                                 type="text"
                                 value={data.full_name}
                                 onChange={e => setData('full_name', e.target.value)}
+                                onBlur={() => touch('full_name')}
                                 placeholder="Nama kamu"
-                                className={`w-full px-4 py-2.5 text-sm rounded-xl border bg-surface-lowest text-on-surface placeholder-on-surface-variant focus:outline-none focus:ring-2 focus:ring-primary/30 transition ${
-                                    errors.full_name ? 'border-red-400' : 'border-outline-variant focus:border-primary'
-                                }`}
+                                className={fieldClass('full_name')}
                             />
+                            {touched.full_name && !data.full_name && (
+                                <p className="text-xs text-red-500">Nama lengkap wajib diisi.</p>
+                            )}
                             {errors.full_name && <p className="text-xs text-red-500">{errors.full_name}</p>}
                         </div>
 
@@ -123,11 +149,13 @@ export default function Register() {
                                 type="email"
                                 value={data.email}
                                 onChange={e => setData('email', e.target.value)}
+                                onBlur={() => touch('email')}
                                 placeholder="email@contoh.com"
-                                className={`w-full px-4 py-2.5 text-sm rounded-xl border bg-surface-lowest text-on-surface placeholder-on-surface-variant focus:outline-none focus:ring-2 focus:ring-primary/30 transition ${
-                                    errors.email ? 'border-red-400' : 'border-outline-variant focus:border-primary'
-                                }`}
+                                className={fieldClass('email')}
                             />
+                            {touched.email && !data.email && (
+                                <p className="text-xs text-red-500">Email wajib diisi.</p>
+                            )}
                             {errors.email && <p className="text-xs text-red-500">{errors.email}</p>}
                         </div>
 
@@ -138,10 +166,14 @@ export default function Register() {
                                 type="password"
                                 value={data.password}
                                 onChange={e => setData('password', e.target.value)}
+                                onBlur={() => touch('password')}
                                 placeholder="Min. 8 karakter"
-                                className="w-full px-4 py-2.5 text-sm rounded-xl border border-outline-variant bg-surface-lowest text-on-surface placeholder-on-surface-variant focus:outline-none focus:ring-2 focus:ring-primary/30 focus:border-primary transition"
+                                className={fieldClass('password')}
                             />
                             <PasswordStrength password={data.password} />
+                            {touched.password && !data.password && (
+                                <p className="text-xs text-red-500">Password wajib diisi.</p>
+                            )}
                             {errors.password && <p className="text-xs text-red-500">{errors.password}</p>}
                         </div>
 
@@ -152,9 +184,19 @@ export default function Register() {
                                 type="password"
                                 value={data.password_confirmation}
                                 onChange={e => setData('password_confirmation', e.target.value)}
+                                onBlur={() => touch('password_confirmation')}
                                 placeholder="Ulangi password"
-                                className="w-full px-4 py-2.5 text-sm rounded-xl border border-outline-variant bg-surface-lowest text-on-surface placeholder-on-surface-variant focus:outline-none focus:ring-2 focus:ring-primary/30 focus:border-primary transition"
+                                className={fieldClass('password_confirmation')}
                             />
+                            {touched.password_confirmation && !data.password_confirmation && (
+                                <p className="text-xs text-red-500">Konfirmasi password wajib diisi.</p>
+                            )}
+                            {passwordMismatch && data.password_confirmation && (
+                                <p className="text-xs text-red-500">Password tidak cocok.</p>
+                            )}
+                            {!passwordMismatch && data.password_confirmation && data.password && (
+                                <p className="text-xs text-primary">Password cocok ✓</p>
+                            )}
                         </div>
 
                         {/* Checkbox Syarat */}
