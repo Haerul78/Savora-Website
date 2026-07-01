@@ -1,5 +1,6 @@
 import AppLayout from '@/Layouts/AppLayout';
 import RecipeCard from '@/Components/RecipeCard';
+import Pagination from '@/Components/Pagination';
 import { usePage, router } from '@inertiajs/react';
 import { useState, useEffect, useRef } from 'react';
 
@@ -122,30 +123,7 @@ export default function RecipeIndex() {
                                 ))}
                             </div>
 
-                            {/* Pagination */}
-                            <div className="flex items-center justify-between pt-2">
-                                <p className="text-xs text-on-surface-variant">
-                                    {recipes.from}–{recipes.to} dari {recipes.total} resep
-                                </p>
-                                <div className="flex gap-2">
-                                    {recipes.prev_page_url && (
-                                        <button
-                                            onClick={() => router.get(recipes.prev_page_url, {}, { preserveState: true })}
-                                            className="px-3 py-1.5 text-sm rounded-xl border border-outline-variant text-on-surface-variant hover:bg-surface-high transition"
-                                        >
-                                            ← Sebelumnya
-                                        </button>
-                                    )}
-                                    {recipes.next_page_url && (
-                                        <button
-                                            onClick={() => router.get(recipes.next_page_url, {}, { preserveState: true })}
-                                            className="px-3 py-1.5 text-sm rounded-xl border border-outline-variant text-on-surface-variant hover:bg-surface-high transition"
-                                        >
-                                            Selanjutnya →
-                                        </button>
-                                    )}
-                                </div>
-                            </div>
+                            <Pagination meta={recipes} />
                         </>
                     ) : (
                         <div className="py-20 text-center space-y-2">
