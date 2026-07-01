@@ -1,6 +1,7 @@
 <?php
 
 use App\Http\Controllers\AuthController;
+use App\Http\Controllers\HomeController;
 use Illuminate\Support\Facades\Route;
 use Inertia\Inertia;
 
@@ -17,7 +18,7 @@ Route::middleware('supabase.auth')->group(function () {
     Route::post('/logout', [AuthController::class, 'logout'])->name('logout');
 
     // Home
-    Route::get('/', fn () => Inertia::render('Home/Index'))->name('home');
+    Route::get('/', [HomeController::class, 'index'])->name('home');
 
     // Resep
     Route::get('/recipes', fn () => Inertia::render('Recipe/Index'))->name('recipes.index');
