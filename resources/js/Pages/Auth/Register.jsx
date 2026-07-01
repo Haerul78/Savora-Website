@@ -60,19 +60,24 @@ export default function Register() {
     return (
         <div className="min-h-screen flex">
             {/* Kolom Kiri — Branding */}
-            <div className="hidden lg:flex lg:w-1/2 bg-primary flex-col justify-between p-12">
-                <div className="flex items-center gap-2">
+            <div className="hidden lg:flex lg:w-1/2 bg-primary flex-col justify-between p-12 relative overflow-hidden">
+                {/* Dekorasi lingkaran */}
+                <div className="absolute -top-16 -right-16 w-64 h-64 rounded-full bg-white/5" />
+                <div className="absolute top-32 -right-8 w-40 h-40 rounded-full bg-white/5" />
+                <div className="absolute -bottom-20 -left-20 w-80 h-80 rounded-full bg-white/5" />
+
+                <div className="relative flex items-center gap-2">
                     <div className="w-9 h-9 rounded-xl bg-white/20 flex items-center justify-center">
                         <span className="text-white font-bold text-lg">S</span>
                     </div>
                     <span className="text-white text-2xl font-bold tracking-tight">Savora</span>
                 </div>
 
-                <div className="space-y-4">
+                <div className="relative space-y-4">
                     <h1 className="text-white text-4xl font-bold leading-tight">
                         Bergabung dan mulai<br />masak hari ini.
                     </h1>
-                    <p className="text-white/70 text-base leading-relaxed">
+                    <p className="text-white/70 text-base leading-relaxed max-w-xs">
                         Daftar gratis dan akses ratusan resep Nusantara lengkap dengan bahan-bahannya.
                     </p>
                 </div>

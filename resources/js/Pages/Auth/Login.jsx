@@ -15,8 +15,13 @@ export default function Login() {
     return (
         <div className="min-h-screen flex">
             {/* Kolom Kiri — Branding */}
-            <div className="hidden lg:flex lg:w-1/2 bg-primary flex-col justify-between p-12">
-                <div>
+            <div className="hidden lg:flex lg:w-1/2 bg-primary flex-col justify-between p-12 relative overflow-hidden">
+                {/* Dekorasi lingkaran */}
+                <div className="absolute -top-16 -right-16 w-64 h-64 rounded-full bg-white/5" />
+                <div className="absolute top-32 -right-8 w-40 h-40 rounded-full bg-white/5" />
+                <div className="absolute -bottom-20 -left-20 w-80 h-80 rounded-full bg-white/5" />
+
+                <div className="relative">
                     <div className="flex items-center gap-2">
                         <div className="w-9 h-9 rounded-xl bg-white/20 flex items-center justify-center">
                             <span className="text-white font-bold text-lg">S</span>
@@ -25,11 +30,11 @@ export default function Login() {
                     </div>
                 </div>
 
-                <div className="space-y-4">
+                <div className="relative space-y-4">
                     <h1 className="text-white text-4xl font-bold leading-tight">
                         Masak lebih mudah,<br />belanja lebih hemat.
                     </h1>
-                    <p className="text-white/70 text-base leading-relaxed">
+                    <p className="text-white/70 text-base leading-relaxed max-w-xs">
                         Temukan resep masakan Nusantara dan pesan bahan segar langsung dari dapur kamu.
                     </p>
                 </div>
