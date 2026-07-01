@@ -1,9 +1,26 @@
 import AppLayout from '@/Layouts/AppLayout';
 import RecipeCard from '@/Components/RecipeCard';
 import { usePage, router } from '@inertiajs/react';
+import { useState, useEffect, useRef } from 'react';
 
 export default function RecipeIndex() {
     const { recipes, categories, difficulties, filters } = usePage().props;
+    const [search, setSearch] = useState(filters.search ?? '');
+    const debounceTimer = useRef(null);
+
+    useEffect(() => {
+        clearTimeout(debounceTimer.current);
+        debounceTimer.current = setTimeout(() => {
+            if (search !== (filters.search ?? '')) {
+                router.get('/recipes', { ...filters, search, page: 1 }, {
+                    preserveState: true,
+                    replace: true,
+                });
+            }
+        }, 400);
+
+        return () => clearTimeout(debounceTimer.current);
+    }, [search]);
 
     function setFilter(key, value) {
         router.get('/recipes', { ...filters, [key]: value, page: 1 }, {
@@ -89,9 +106,9 @@ export default function RecipeIndex() {
                         <h1 className="text-xl font-bold text-on-surface shrink-0">Daftar Resep</h1>
                         <input
                             type="text"
-                            defaultValue={filters.search}
+                            value={search}
                             placeholder="Cari resep..."
-                            onChange={e => setFilter('search', e.target.value)}
+                            onChange={e => setSearch(e.target.value)}
                             className="w-64 px-4 py-2 text-sm rounded-xl border border-outline-variant bg-surface-lowest text-on-surface placeholder-on-surface-variant focus:outline-none focus:ring-2 focus:ring-primary/30 focus:border-primary transition"
                         />
                     </div>
