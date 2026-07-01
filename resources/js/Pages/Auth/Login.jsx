@@ -1,7 +1,7 @@
-import { useForm, usePage } from '@inertiajs/react';
+import { useForm, usePage, Link } from '@inertiajs/react';
 
 export default function Login() {
-    const { errors } = usePage().props;
+    const { errors, flash } = usePage().props;
     const { data, setData, post, processing } = useForm({
         email: '',
         password: '',
@@ -13,51 +13,93 @@ export default function Login() {
     }
 
     return (
-        <div className="min-h-screen bg-surface flex items-center justify-center p-4">
-            <div className="bg-surface-lowest rounded-2xl shadow p-8 w-full max-w-sm space-y-6">
+        <div className="min-h-screen flex">
+            {/* Kolom Kiri — Branding */}
+            <div className="hidden lg:flex lg:w-1/2 bg-primary flex-col justify-between p-12">
                 <div>
-                    <h1 className="text-2xl font-bold text-primary">Savora</h1>
-                    <p className="text-sm text-on-surface-variant mt-1">Masuk ke akun kamu</p>
+                    <div className="flex items-center gap-2">
+                        <div className="w-9 h-9 rounded-xl bg-white/20 flex items-center justify-center">
+                            <span className="text-white font-bold text-lg">S</span>
+                        </div>
+                        <span className="text-white text-2xl font-bold tracking-tight">Savora</span>
+                    </div>
                 </div>
 
-                {errors.email && (
-                    <p className="text-sm text-red-600 bg-red-50 border border-red-200 rounded-lg px-3 py-2">{errors.email}</p>
-                )}
+                <div className="space-y-4">
+                    <h1 className="text-white text-4xl font-bold leading-tight">
+                        Masak lebih mudah,<br />belanja lebih hemat.
+                    </h1>
+                    <p className="text-white/70 text-base leading-relaxed">
+                        Temukan resep masakan Nusantara dan pesan bahan segar langsung dari dapur kamu.
+                    </p>
+                </div>
 
-                <form onSubmit={submit} className="space-y-4">
-                    <div>
-                        <label className="block text-sm font-medium text-on-surface mb-1">Email</label>
-                        <input
-                            type="email"
-                            value={data.email}
-                            onChange={e => setData('email', e.target.value)}
-                            className="w-full px-3 py-2 text-sm border border-outline-variant rounded-xl bg-surface focus:outline-none focus:border-primary"
-                            placeholder="email@contoh.com"
-                        />
-                    </div>
-                    <div>
-                        <label className="block text-sm font-medium text-on-surface mb-1">Password</label>
-                        <input
-                            type="password"
-                            value={data.password}
-                            onChange={e => setData('password', e.target.value)}
-                            className="w-full px-3 py-2 text-sm border border-outline-variant rounded-xl bg-surface focus:outline-none focus:border-primary"
-                            placeholder="••••••••"
-                        />
-                    </div>
-                    <button
-                        type="submit"
-                        disabled={processing}
-                        className="w-full bg-primary text-white text-sm font-semibold rounded-xl py-2.5 hover:bg-primary-container disabled:opacity-50 transition"
-                    >
-                        {processing ? 'Masuk...' : 'Masuk'}
-                    </button>
-                </form>
+                <div />
+            </div>
 
-                <p className="text-sm text-center text-on-surface-variant">
-                    Belum punya akun?{' '}
-                    <a href="/register" className="text-primary font-medium hover:underline">Daftar</a>
-                </p>
+            {/* Kolom Kanan — Form */}
+            <div className="flex-1 flex items-center justify-center bg-surface p-8">
+                <div className="w-full max-w-sm space-y-8">
+                    {/* Header */}
+                    <div className="space-y-1">
+                        <h2 className="text-2xl font-bold text-on-surface">Masuk ke akun</h2>
+                        <p className="text-sm text-on-surface-variant">
+                            Belum punya akun?{' '}
+                            <Link href="/register" className="text-primary font-medium hover:underline">
+                                Daftar sekarang
+                            </Link>
+                        </p>
+                    </div>
+
+                    {/* Flash error */}
+                    {flash?.error && (
+                        <div className="text-sm text-red-600 bg-red-50 border border-red-200 rounded-xl px-4 py-3">
+                            {flash.error}
+                        </div>
+                    )}
+
+                    {/* Form */}
+                    <form onSubmit={submit} className="space-y-5">
+                        <div className="space-y-1.5">
+                            <label className="block text-sm font-medium text-on-surface">
+                                Email
+                            </label>
+                            <input
+                                type="email"
+                                value={data.email}
+                                onChange={e => setData('email', e.target.value)}
+                                placeholder="email@contoh.com"
+                                className={`w-full px-4 py-2.5 text-sm rounded-xl border bg-surface-lowest text-on-surface placeholder-on-surface-variant focus:outline-none focus:ring-2 focus:ring-primary/30 transition ${
+                                    errors.email ? 'border-red-400' : 'border-outline-variant focus:border-primary'
+                                }`}
+                            />
+                            {errors.email && (
+                                <p className="text-xs text-red-500">{errors.email}</p>
+                            )}
+                        </div>
+
+                        <div className="space-y-1.5">
+                            <label className="block text-sm font-medium text-on-surface">
+                                Password
+                            </label>
+                            <input
+                                type="password"
+                                value={data.password}
+                                onChange={e => setData('password', e.target.value)}
+                                placeholder="••••••••"
+                                className="w-full px-4 py-2.5 text-sm rounded-xl border border-outline-variant bg-surface-lowest text-on-surface placeholder-on-surface-variant focus:outline-none focus:ring-2 focus:ring-primary/30 focus:border-primary transition"
+                            />
+                        </div>
+
+                        <button
+                            type="submit"
+                            disabled={processing}
+                            className="w-full bg-primary hover:bg-primary-container disabled:opacity-60 text-white font-semibold text-sm rounded-xl py-3 transition"
+                        >
+                            {processing ? 'Masuk...' : 'Masuk'}
+                        </button>
+                    </form>
+                </div>
             </div>
         </div>
     );
