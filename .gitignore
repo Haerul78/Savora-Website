@@ -37,3 +37,6 @@ savora_PRD_web.md
 # Test pages (dev only)
 /resources/js/Pages/SupabaseTest.jsx
 /resources/js/Pages/MidtransTest.jsx
+
+# Local reference files
+Database.sql

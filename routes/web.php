@@ -15,6 +15,10 @@ Route::get('/midtrans-test', function () {
     return Inertia::render('MidtransTest');
 });
 
+Route::get('/layout-test', function () {
+    return Inertia::render('LayoutTest');
+});
+
 Route::post('/midtrans-test/ping', function () {
     \Midtrans\Config::$serverKey = env('MIDTRANS_SERVER_KEY');
     \Midtrans\Config::$isProduction = false;
