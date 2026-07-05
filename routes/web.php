@@ -5,6 +5,8 @@ use App\Http\Controllers\HomeController;
 use App\Http\Controllers\RecipeController;
 use App\Http\Controllers\SavedRecipeController;
 use App\Http\Controllers\CartBulkController;
+use App\Http\Controllers\StoreController;
+use App\Http\Controllers\CartController;
 use Illuminate\Support\Facades\Route;
 use Inertia\Inertia;
 
@@ -29,10 +31,13 @@ Route::middleware('supabase.auth')->group(function () {
     Route::post('/recipes/{recipe}/save', [SavedRecipeController::class, 'toggle'])->name('recipes.save');
 
     // Toko
-    Route::get('/store', fn () => Inertia::render('Store/Index'))->name('store.index');
+    Route::get('/store', [StoreController::class, 'index'])->name('store.index');
 
     // Keranjang
-    Route::get('/cart', fn () => Inertia::render('Cart/Index'))->name('cart.index');
+    Route::get('/cart', [CartController::class, 'index'])->name('cart.index');
+    Route::post('/cart', [CartController::class, 'store'])->name('cart.store');
+    Route::patch('/cart/{cartItem}', [CartController::class, 'update'])->name('cart.update');
+    Route::delete('/cart/{cartItem}', [CartController::class, 'destroy'])->name('cart.destroy');
     Route::post('/cart/bulk', [CartBulkController::class, 'store'])->name('cart.bulk');
 
     // Checkout
