@@ -3,6 +3,8 @@
 use App\Http\Controllers\AuthController;
 use App\Http\Controllers\HomeController;
 use App\Http\Controllers\RecipeController;
+use App\Http\Controllers\SavedRecipeController;
+use App\Http\Controllers\CartBulkController;
 use Illuminate\Support\Facades\Route;
 use Inertia\Inertia;
 
@@ -23,13 +25,15 @@ Route::middleware('supabase.auth')->group(function () {
 
     // Resep
     Route::get('/recipes', [RecipeController::class, 'index'])->name('recipes.index');
-    Route::get('/recipes/{slug}', fn ($slug) => Inertia::render('Recipe/Show', ['slug' => $slug]))->name('recipes.show');
+    Route::get('/recipes/{slug}', [RecipeController::class, 'show'])->name('recipes.show');
+    Route::post('/recipes/{recipe}/save', [SavedRecipeController::class, 'toggle'])->name('recipes.save');
 
     // Toko
     Route::get('/store', fn () => Inertia::render('Store/Index'))->name('store.index');
 
     // Keranjang
     Route::get('/cart', fn () => Inertia::render('Cart/Index'))->name('cart.index');
+    Route::post('/cart/bulk', [CartBulkController::class, 'store'])->name('cart.bulk');
 
     // Checkout
     Route::get('/checkout/payment', fn () => Inertia::render('Checkout/Payment'))->name('checkout.payment');
