@@ -6,6 +6,7 @@ use App\Models\Address;
 use App\Models\CartItem;
 use App\Models\Order;
 use App\Models\OrderItem;
+use App\Models\Payment;
 use Illuminate\Http\Request;
 use Illuminate\Support\Facades\DB;
 use Illuminate\Support\Str;
@@ -105,6 +106,15 @@ class CheckoutController extends Controller
                 'first_name' => $address->recipient_name,
                 'phone'      => $address->phone,
             ],
+        ]);
+
+        Payment::create([
+            'id'             => (string) Str::uuid(),
+            'order_id'       => $order->id,
+            'user_id'        => $userId,
+            'status'         => 'pending',
+            'amount'         => $order->total,
+            'midtrans_token' => $snapToken,
         ]);
 
         return redirect()->route('checkout.payment')
