@@ -11,6 +11,9 @@ use App\Http\Controllers\CheckoutController;
 use Illuminate\Support\Facades\Route;
 use Inertia\Inertia;
 
+// ─── Public webhook (dipanggil server Midtrans, bukan user login) ─────────────
+Route::post('/checkout/callback', [CheckoutController::class, 'callback'])->name('checkout.callback');
+
 // ─── Guest routes (hanya bisa diakses jika belum login) ───────────────────────
 Route::middleware('supabase.guest')->group(function () {
     Route::get('/login', [AuthController::class, 'showLogin'])->name('login');

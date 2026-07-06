@@ -16,6 +16,10 @@ return Application::configure(basePath: dirname(__DIR__))
             \App\Http\Middleware\HandleInertiaRequests::class,
         ]);
 
+        $middleware->validateCsrfTokens(except: [
+            'checkout/callback',
+        ]);
+
         $middleware->alias([
             'supabase.auth'  => \App\Http\Middleware\SupabaseAuth::class,
             'supabase.guest' => \App\Http\Middleware\SupabaseGuest::class,

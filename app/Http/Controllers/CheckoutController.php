@@ -122,6 +122,46 @@ class CheckoutController extends Controller
             ->with('snapToken', $snapToken);
     }
 
+    public function callback(Request $request)
+    {
+        $notification = new \Midtrans\Notification();
+
+        $order = Order::where('order_number', $notification->order_id)
+            ->with('payment')
+            ->first();
+
+        if (!$order || !$order->payment) {
+            return response()->json(['message' => 'Order not found'], 404);
+        }
+
+        $status = $notification->transaction_status;
+        $fraud = $notification->fraud_status ?? null;
+
+        if ($status === 'capture' && $fraud === 'accept') {
+            $status = 'settlement';
+        }
+
+        if ($status === 'settlement') {
+            $order->payment->update([
+                'status'         => 'paid',
+                'transaction_id' => $notification->transaction_id,
+                'paid_at'        => now(),
+            ]);
+            $order->update(['status' => 'paid']);
+            CartItem::where('user_id', $order->user_id)->delete();
+        } elseif ($status === 'pending') {
+            $order->payment->update(['status' => 'pending']);
+        } elseif (in_array($status, ['deny', 'cancel', 'expire'])) {
+            $order->payment->update([
+                'status'         => 'failed',
+                'failure_reason' => $status,
+            ]);
+            $order->update(['status' => 'failed']);
+        }
+
+        return response()->json(['message' => 'OK']);
+    }
+
     public function success(Request $request)
     {
         $userId = $this->currentUserId();
