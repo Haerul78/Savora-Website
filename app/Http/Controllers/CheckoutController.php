@@ -10,9 +10,19 @@ use Illuminate\Http\Request;
 use Illuminate\Support\Facades\DB;
 use Illuminate\Support\Str;
 use Inertia\Inertia;
+use Midtrans\Config as MidtransConfig;
+use Midtrans\Snap;
 
 class CheckoutController extends Controller
 {
+    public function __construct()
+    {
+        MidtransConfig::$serverKey = config('midtrans.server_key');
+        MidtransConfig::$isProduction = config('midtrans.is_production');
+        MidtransConfig::$isSanitized = config('midtrans.is_sanitized');
+        MidtransConfig::$is3ds = config('midtrans.is_3ds');
+    }
+
     public function payment(Request $request)
     {
         $userId = $this->currentUserId();
@@ -86,7 +96,20 @@ class CheckoutController extends Controller
             return $order;
         });
 
-        return redirect()->route('checkout.payment')->with('orderId', $order->id);
+        $snapToken = Snap::getSnapToken([
+            'transaction_details' => [
+                'order_id'     => $order->order_number,
+                'gross_amount' => (int) $order->total,
+            ],
+            'customer_details' => [
+                'first_name' => $address->recipient_name,
+                'phone'      => $address->phone,
+            ],
+        ]);
+
+        return redirect()->route('checkout.payment')
+            ->with('orderId', $order->id)
+            ->with('snapToken', $snapToken);
     }
 
     public function success(Request $request)
