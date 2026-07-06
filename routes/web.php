@@ -7,6 +7,7 @@ use App\Http\Controllers\SavedRecipeController;
 use App\Http\Controllers\CartBulkController;
 use App\Http\Controllers\StoreController;
 use App\Http\Controllers\CartController;
+use App\Http\Controllers\CheckoutController;
 use Illuminate\Support\Facades\Route;
 use Inertia\Inertia;
 
@@ -41,8 +42,9 @@ Route::middleware('supabase.auth')->group(function () {
     Route::post('/cart/bulk', [CartBulkController::class, 'store'])->name('cart.bulk');
 
     // Checkout
-    Route::get('/checkout/payment', fn () => Inertia::render('Checkout/Payment'))->name('checkout.payment');
-    Route::get('/checkout/success', fn () => Inertia::render('Checkout/Success'))->name('checkout.success');
+    Route::get('/checkout/payment', [CheckoutController::class, 'payment'])->name('checkout.payment');
+    Route::post('/checkout/process', [CheckoutController::class, 'process'])->name('checkout.process');
+    Route::get('/checkout/success', [CheckoutController::class, 'success'])->name('checkout.success');
 
     // Profil
     Route::get('/profile', fn () => Inertia::render('Profile/Index'))->name('profile.index');
