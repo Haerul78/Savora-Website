@@ -8,6 +8,7 @@ use App\Http\Controllers\CartBulkController;
 use App\Http\Controllers\StoreController;
 use App\Http\Controllers\CartController;
 use App\Http\Controllers\CheckoutController;
+use App\Http\Controllers\ProfileController;
 use Illuminate\Support\Facades\Route;
 use Inertia\Inertia;
 
@@ -54,5 +55,11 @@ Route::middleware('supabase.auth')->group(function () {
     Route::post('/addresses', [CheckoutController::class, 'storeAddress'])->name('addresses.store');
 
     // Profil
-    Route::get('/profile', fn () => Inertia::render('Profile/Index'))->name('profile.index');
+    Route::prefix('profile')->name('profile.')->group(function () {
+        Route::get('/', [ProfileController::class, 'index'])->name('index');
+        Route::post('/update', [ProfileController::class, 'update'])->name('update');
+        Route::post('/avatar', [ProfileController::class, 'updateAvatar'])->name('avatar');
+        Route::get('/payment-history', [ProfileController::class, 'paymentHistory'])->name('payment-history');
+        Route::get('/saved-recipes', [ProfileController::class, 'savedRecipes'])->name('saved-recipes');
+    });
 });
