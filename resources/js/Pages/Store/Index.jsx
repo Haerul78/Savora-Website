@@ -1,10 +1,25 @@
-import React, { useState } from 'react';
+import React, { useState, useEffect } from 'react';
 import { Head, router, Link, usePage } from '@inertiajs/react';
 import AppLayout from '@/Layouts/AppLayout';
+import Skeleton from '@/Components/Skeleton';
 
 export default function Index({ products, categories, filters }) {
     const { props } = usePage();
     const [toast, setToast] = useState(null);
+    const [loading, setLoading] = useState(false);
+
+    useEffect(() => {
+        const removeStart = router.on('start', (event) => {
+            if (event.detail.visit.url.pathname === '/store') {
+                setLoading(true);
+            }
+        });
+        const removeFinish = router.on('finish', () => setLoading(false));
+        return () => {
+            removeStart();
+            removeFinish();
+        };
+    }, []);
 
     // Filter states
     const [search, setSearch] = useState(filters.search || '');
@@ -262,7 +277,18 @@ export default function Index({ products, categories, filters }) {
 
                     {/* Right Product Grid */}
                     <div className="lg:col-span-9 space-y-8">
-                        {products.data.length > 0 ? (
+                        {loading ? (
+                            <div className="grid grid-cols-2 md:grid-cols-3 xl:grid-cols-4 gap-6">
+                                {Array.from({ length: 8 }).map((_, idx) => (
+                                    <div key={idx} className="bg-white/80 rounded-2xl overflow-hidden border border-outline-variant/15 space-y-3 p-4">
+                                        <Skeleton className="aspect-[4/3] w-full" />
+                                        <Skeleton className="h-4 w-3/4" />
+                                        <Skeleton className="h-3 w-1/2" />
+                                        <Skeleton className="h-8 w-full" />
+                                    </div>
+                                ))}
+                            </div>
+                        ) : products.data.length > 0 ? (
                             <>
                                 <div className="grid grid-cols-2 md:grid-cols-3 xl:grid-cols-4 gap-6">
                                     {products.data.map((product) => (

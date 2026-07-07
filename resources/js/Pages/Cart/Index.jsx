@@ -1,9 +1,24 @@
-import React, { useState } from 'react';
+import React, { useState, useEffect } from 'react';
 import { Head, Link, router } from '@inertiajs/react';
 import AppLayout from '@/Layouts/AppLayout';
+import Skeleton from '@/Components/Skeleton';
 
 export default function Index({ groupedCart }) {
     const [toast, setToast] = useState(null);
+    const [loading, setLoading] = useState(false);
+
+    useEffect(() => {
+        const removeStart = router.on('start', (event) => {
+            if (event.detail.visit.url.pathname.startsWith('/cart')) {
+                setLoading(true);
+            }
+        });
+        const removeFinish = router.on('finish', () => setLoading(false));
+        return () => {
+            removeStart();
+            removeFinish();
+        };
+    }, []);
 
     // Calculate overall details
     const totalItemsCount = groupedCart.reduce((sum, group) => {
@@ -127,7 +142,22 @@ export default function Index({ groupedCart }) {
                         
                         {/* LEFT COLUMN: Grouped Cart Items (65% equivalent) */}
                         <div className="lg:col-span-8 space-y-8">
-                            {groupedCart.map((group) => (
+                            {loading ? (
+                                Array.from({ length: 2 }).map((_, idx) => (
+                                    <div key={idx} className="bg-white/50 rounded-3xl p-6 border border-white/40 space-y-4">
+                                        <Skeleton className="h-5 w-1/3" />
+                                        {Array.from({ length: 2 }).map((__, rowIdx) => (
+                                            <div key={rowIdx} className="flex items-center gap-4 py-2">
+                                                <Skeleton className="w-16 h-16 shrink-0" />
+                                                <div className="flex-1 space-y-2">
+                                                    <Skeleton className="h-4 w-1/2" />
+                                                    <Skeleton className="h-3 w-1/3" />
+                                                </div>
+                                            </div>
+                                        ))}
+                                    </div>
+                                ))
+                            ) : groupedCart.map((group) => (
                                 <div
                                     key={group.recipe_id || 'kitchen_needs'}
                                     className="bg-white/50 backdrop-blur-sm rounded-3xl p-6 border border-white/40 shadow-sm space-y-6"

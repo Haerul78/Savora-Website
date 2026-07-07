@@ -1,11 +1,26 @@
-import React, { useState } from 'react';
+import React, { useState, useEffect } from 'react';
 import { Head, Link, router } from '@inertiajs/react';
 import AppLayout from '@/Layouts/AppLayout';
 import ProfileLayout from '@/Layouts/ProfileLayout';
 import StatusBadge from '@/components/StatusBadge';
+import Skeleton from '@/Components/Skeleton';
 
 export default function PaymentHistory({ payments, statusFilter, stats }) {
     const [processingId, setProcessingId] = useState(null);
+    const [loading, setLoading] = useState(false);
+
+    useEffect(() => {
+        const removeStart = router.on('start', (event) => {
+            if (event.detail.visit.url.pathname.startsWith('/profile/payment-history')) {
+                setLoading(true);
+            }
+        });
+        const removeFinish = router.on('finish', () => setLoading(false));
+        return () => {
+            removeStart();
+            removeFinish();
+        };
+    }, []);
 
     // Format currency helper
     const formatRupiah = (value) => {
@@ -95,7 +110,25 @@ export default function PaymentHistory({ payments, statusFilter, stats }) {
                         </div>
 
                         {/* Orders List */}
-                        {payments.data.length === 0 ? (
+                        {loading ? (
+                            <div className="space-y-4">
+                                {Array.from({ length: 3 }).map((_, idx) => (
+                                    <div key={idx} className="border border-outline-variant/15 rounded-2xl p-4 bg-white space-y-3">
+                                        <div className="flex items-center justify-between">
+                                            <Skeleton className="h-4 w-1/3" />
+                                            <Skeleton className="h-5 w-20" />
+                                        </div>
+                                        <div className="flex items-center gap-3">
+                                            <Skeleton className="w-12 h-12 shrink-0" />
+                                            <div className="flex-1 space-y-2">
+                                                <Skeleton className="h-3 w-1/2" />
+                                                <Skeleton className="h-3 w-1/3" />
+                                            </div>
+                                        </div>
+                                    </div>
+                                ))}
+                            </div>
+                        ) : payments.data.length === 0 ? (
                             <div className="text-center py-12 bg-surface-low/30 rounded-2xl border border-dashed border-outline-variant/50">
                                 <svg xmlns="http://www.w3.org/2000/svg" className="w-12 h-12 text-on-surface-variant/35 mx-auto mb-3" fill="none" viewBox="0 0 24 24" stroke="currentColor">
                                     <path strokeLinecap="round" strokeLinejoin="round" strokeWidth={1.5} d="M3 3h2l.4 2M7 13h10l4-8H5.4M7 13L5.4 5M7 13l-2.293 2.293c-.63.63-.184 1.707.707 1.707H17m0 0a2 2 0 100 4 2 2 0 000-4zm-8 2a2 2 0 11-4 0 2 2 0 014 0z" />
