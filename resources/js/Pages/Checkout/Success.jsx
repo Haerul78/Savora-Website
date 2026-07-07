@@ -26,6 +26,8 @@ export default function Success({ order }) {
     };
 
     const isPaid = order.status === 'paid' || order.payment?.status === 'paid' || order.status === 'confirmed';
+    const failedStatuses = ['failed', 'expired', 'cancel', 'cancelled', 'deny'];
+    const isFailed = failedStatuses.includes(order.status) || failedStatuses.includes(order.payment?.status);
 
     return (
         <AppLayout>
@@ -40,6 +42,12 @@ export default function Success({ order }) {
                                 <path strokeLinecap="round" strokeLinejoin="round" strokeWidth={3} d="M5 13l4 4L19 7" />
                             </svg>
                         </div>
+                    ) : isFailed ? (
+                        <div className="w-20 h-20 bg-tertiary/10 rounded-full flex items-center justify-center text-tertiary">
+                            <svg xmlns="http://www.w3.org/2000/svg" className="w-10 h-10" fill="none" viewBox="0 0 24 24" stroke="currentColor">
+                                <path strokeLinecap="round" strokeLinejoin="round" strokeWidth={2} d="M6 18L18 6M6 6l12 12" />
+                            </svg>
+                        </div>
                     ) : (
                         <div className="w-20 h-20 bg-yellow-500/10 rounded-full flex items-center justify-center text-yellow-600 animate-pulse">
                             <svg xmlns="http://www.w3.org/2000/svg" className="w-10 h-10" fill="none" viewBox="0 0 24 24" stroke="currentColor">
@@ -51,27 +59,31 @@ export default function Success({ order }) {
 
                 {/* Heading */}
                 <h1 className="text-3xl font-bold text-on-surface tracking-tight">
-                    {isPaid ? 'Pembayaran Berhasil!' : 'Menunggu Pembayaran'}
+                    {isPaid ? 'Pembayaran Berhasil!' : isFailed ? 'Pembayaran Gagal' : 'Menunggu Pembayaran'}
                 </h1>
                 <p className="text-on-surface-variant text-sm mt-2 max-w-md mx-auto">
-                    {isPaid 
-                        ? 'Terima kasih atas pembayaran Anda. Pesanan Anda sedang diproses dan akan segera dikirim.' 
+                    {isPaid
+                        ? 'Terima kasih atas pembayaran Anda. Pesanan Anda sedang diproses dan akan segera dikirim.'
+                        : isFailed
+                        ? 'Pembayaran untuk pesanan ini gagal, kedaluwarsa, atau dibatalkan. Silakan coba checkout ulang.'
                         : 'Pesanan Anda telah dibuat. Silakan selesaikan pembayaran Anda via popup Midtrans.'}
                 </p>
 
                 {/* Status Badge */}
                 <div className="mt-4">
                     <span className={`inline-flex items-center px-4 py-1.5 rounded-full text-xs font-bold ${
-                        isPaid 
-                            ? 'bg-secondary-container text-primary' 
+                        isPaid
+                            ? 'bg-secondary-container text-primary'
+                            : isFailed
+                            ? 'bg-tertiary/10 text-tertiary'
                             : 'bg-yellow-100 text-yellow-800'
                     }`}>
-                        {isPaid ? 'Sudah Dibayar' : 'Menunggu Pembayaran'}
+                        {isPaid ? 'Sudah Dibayar' : isFailed ? 'Gagal / Kedaluwarsa' : 'Menunggu Pembayaran'}
                     </span>
                 </div>
 
                 {/* Mockup Simulation for Local Development */}
-                {isLocal && !isPaid && (
+                {isLocal && !isPaid && !isFailed && (
                     <div className="mt-8 p-6 bg-surface-low rounded-2xl border border-dashed border-outline-variant/60 max-w-md mx-auto">
                         <p className="text-xs font-bold text-on-surface flex items-center justify-center gap-1 mb-2">
                             <span className="w-2 h-2 rounded-full bg-primary animate-ping"></span>

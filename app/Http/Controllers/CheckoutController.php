@@ -226,6 +226,10 @@ class CheckoutController extends Controller
 
     public function mockPay(Request $request)
     {
+        if (!app()->environment('local')) {
+            abort(404);
+        }
+
         $request->validate([
             'order_id' => 'required|exists:orders,id',
         ]);
