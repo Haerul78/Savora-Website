@@ -30,7 +30,7 @@ class CheckoutController extends Controller
 
         $cartItems = CartItem::where('user_id', $userId)->with('product')->get();
 
-        if ($cartItems->isEmpty()) {
+        if ($cartItems->isEmpty() && !session('orderId')) {
             return redirect()->route('cart.index')->with('error', 'Keranjang kosong.');
         }
 
@@ -42,6 +42,8 @@ class CheckoutController extends Controller
             'cartItems' => $cartItems,
             'addresses' => $addresses,
             'subtotal'  => $subtotal,
+            'snapToken' => session('snapToken'),
+            'orderId'   => session('orderId'),
         ]);
     }
 
@@ -169,6 +171,11 @@ class CheckoutController extends Controller
             ->with(['items', 'payment'])
             ->findOrFail($request->query('order_id'));
 
+        // Clear cart if order is paid or confirmed
+        if (in_array($order->status, ['paid', 'confirmed'])) {
+            CartItem::where('user_id', $userId)->delete();
+        }
+
         return Inertia::render('Checkout/Success', [
             'order' => $order,
         ]);
@@ -178,5 +185,71 @@ class CheckoutController extends Controller
     {
         $user = session('supabase_user');
         return is_array($user) ? ($user['id'] ?? null) : ($user?->id);
+    }
+
+    public function storeAddress(Request $request)
+    {
+        $request->validate([
+            'label'          => 'required|string|max:100',
+            'recipient_name' => 'required|string|max:255',
+            'phone'          => 'required|string|max:50',
+            'full_address'   => 'required|string',
+            'city'           => 'required|string|max:100',
+            'province'       => 'required|string|max:100',
+            'postal_code'    => 'required|string|max:20',
+        ]);
+
+        $userId = $this->currentUserId();
+
+        $hasPrimary = Address::where('user_id', $userId)->where('is_primary', true)->exists();
+        $isPrimary = !$hasPrimary || $request->boolean('is_primary');
+
+        if ($isPrimary) {
+            Address::where('user_id', $userId)->update(['is_primary' => false]);
+        }
+
+        Address::create([
+            'id'             => (string) Str::uuid(),
+            'user_id'        => $userId,
+            'label'          => $request->label,
+            'recipient_name' => $request->recipient_name,
+            'phone'          => $request->phone,
+            'full_address'   => $request->full_address,
+            'city'           => $request->city,
+            'province'       => $request->province,
+            'postal_code'    => $request->postal_code,
+            'is_primary'     => $isPrimary,
+        ]);
+
+        return back()->with('success', 'Alamat berhasil ditambahkan.');
+    }
+
+    public function mockPay(Request $request)
+    {
+        $request->validate([
+            'order_id' => 'required|exists:orders,id',
+        ]);
+
+        $userId = $this->currentUserId();
+        $order = Order::where('id', $request->order_id)
+            ->where('user_id', $userId)
+            ->with('payment')
+            ->firstOrFail();
+
+        DB::transaction(function () use ($order, $userId) {
+            if ($order->payment) {
+                $order->payment->update([
+                    'status'         => 'paid',
+                    'transaction_id' => 'MOCK-' . strtoupper(Str::random(12)),
+                    'paid_at'        => now(),
+                ]);
+            }
+            $order->update(['status' => 'paid']);
+
+            CartItem::where('user_id', $userId)->delete();
+        });
+
+        return redirect()->route('checkout.success', ['order_id' => $order->id])
+            ->with('success', 'Pembayaran berhasil disimulasikan!');
     }
 }

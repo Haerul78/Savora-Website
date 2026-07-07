@@ -48,6 +48,10 @@ Route::middleware('supabase.auth')->group(function () {
     Route::get('/checkout/payment', [CheckoutController::class, 'payment'])->name('checkout.payment');
     Route::post('/checkout/process', [CheckoutController::class, 'process'])->name('checkout.process');
     Route::get('/checkout/success', [CheckoutController::class, 'success'])->name('checkout.success');
+    Route::post('/checkout/mock-pay', [CheckoutController::class, 'mockPay'])->name('checkout.mock-pay');
+
+    // Alamat
+    Route::post('/addresses', [CheckoutController::class, 'storeAddress'])->name('addresses.store');
 
     // Profil
     Route::get('/profile', fn () => Inertia::render('Profile/Index'))->name('profile.index');
