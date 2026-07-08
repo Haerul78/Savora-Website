@@ -1,4 +1,4 @@
-import { useForm, usePage, Link } from '@inertiajs/react';
+import { Head, useForm, usePage, Link } from '@inertiajs/react';
 
 export default function Login() {
     const { errors, flash } = usePage().props;
@@ -14,6 +14,7 @@ export default function Login() {
 
     return (
         <div className="min-h-screen flex">
+            <Head title="Masuk - Savora" />
             {/* Kolom Kiri — Branding */}
             <div className="hidden lg:flex lg:w-1/2 bg-primary flex-col justify-between p-12 relative overflow-hidden">
                 {/* Dekorasi lingkaran */}

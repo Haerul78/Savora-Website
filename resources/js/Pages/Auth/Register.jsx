@@ -1,4 +1,4 @@
-import { useForm, usePage, Link } from '@inertiajs/react';
+import { Head, useForm, usePage, Link } from '@inertiajs/react';
 import { useState, useEffect } from 'react';
 
 function PasswordStrength({ password }) {
@@ -83,6 +83,8 @@ export default function Register() {
 
     return (
         <div className="min-h-screen flex">
+            <Head title="Daftar - Savora" />
+
             {/* Kolom Kiri — Branding */}
             <div className="hidden lg:flex lg:w-1/2 bg-primary flex-col justify-between p-12 relative overflow-hidden">
                 {/* Dekorasi lingkaran */}

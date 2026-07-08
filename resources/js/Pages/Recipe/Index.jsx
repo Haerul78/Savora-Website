@@ -2,7 +2,7 @@ import AppLayout from '@/Layouts/AppLayout';
 import RecipeCard from '@/Components/RecipeCard';
 import Pagination from '@/Components/Pagination';
 import Skeleton from '@/Components/Skeleton';
-import { usePage, router } from '@inertiajs/react';
+import { usePage, router, Head } from '@inertiajs/react';
 import { useState, useEffect, useRef } from 'react';
 
 export default function RecipeIndex() {
@@ -53,6 +53,8 @@ export default function RecipeIndex() {
 
     return (
         <AppLayout>
+            <Head title="Daftar Resep - Savora" />
+
             <div className="flex gap-6">
                 {/* Filter Panel */}
                 <aside className="w-52 shrink-0">

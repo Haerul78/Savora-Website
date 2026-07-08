@@ -2,7 +2,7 @@ import AppLayout from '@/Layouts/AppLayout';
 import CategoryChips from '@/Components/CategoryChips';
 import RecipeCard from '@/Components/RecipeCard';
 import ProductCard from '@/Components/ProductCard';
-import { usePage, Link } from '@inertiajs/react';
+import { usePage, Link, Head } from '@inertiajs/react';
 import { useState } from 'react';
 
 export default function Home() {
@@ -15,6 +15,8 @@ export default function Home() {
 
     return (
         <AppLayout>
+            <Head title="Beranda - Savora" />
+
             <div className="space-y-10 pb-10">
                 {/* Greeting */}
                 <section>
