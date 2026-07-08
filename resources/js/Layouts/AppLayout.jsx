@@ -1,4 +1,5 @@
 import { Link, usePage } from '@inertiajs/react';
+import Toast from '@/Components/Toast';
 
 const navItems = [
     {
@@ -58,6 +59,8 @@ export default function AppLayout({ children }) {
 
     return (
         <div className="flex min-h-screen bg-surface">
+            <Toast />
+
             {/* Sidebar */}
             <aside className="fixed top-0 left-0 h-screen w-64 bg-white/70 backdrop-blur-xl border-r border-white/40 shadow-lg flex flex-col z-40">
                 {/* Logo */}

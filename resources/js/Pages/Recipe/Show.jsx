@@ -1,15 +1,11 @@
 import React, { useState, useEffect } from 'react';
-import { Head, Link, router, usePage } from '@inertiajs/react';
+import { Head, Link, router } from '@inertiajs/react';
 import AppLayout from '@/Layouts/AppLayout';
 import RecipeCard from '@/Components/RecipeCard';
 
 export default function Show({ recipe, isSaved, relatedRecipes }) {
-    const { props } = usePage();
-    
     // State to track checked status of each ingredient
     const [checkedIngredients, setCheckedIngredients] = useState({});
-    // Local state for toast notification
-    const [toast, setToast] = useState(null);
     // State to track active cooking step
     const [activeStep, setActiveStep] = useState(0);
 
@@ -65,19 +61,11 @@ export default function Show({ recipe, isSaved, relatedRecipes }) {
     const handleToggleBookmark = () => {
         router.post(route('recipes.save', recipe.id), {}, {
             preserveScroll: true,
-            onSuccess: () => {
-                showToast(isSaved ? 'Resep dihapus dari daftar simpanan' : 'Resep berhasil disimpan!');
-            }
         });
     };
 
     // Handle Buy Ingredients (Bulk Add to Cart)
     const handleBuyIngredients = () => {
-        if (selectedIngredients.length === 0) {
-            showToast('Silakan pilih setidaknya satu bahan untuk dibeli', 'error');
-            return;
-        }
-
         const items = selectedIngredients.map(ing => ({
             product_id: ing.product_id,
             recipe_id: recipe.id,
@@ -86,44 +74,12 @@ export default function Show({ recipe, isSaved, relatedRecipes }) {
 
         router.post(route('cart.bulk'), { items }, {
             preserveScroll: true,
-            onSuccess: () => {
-                showToast(`Berhasil menambahkan ${selectedIngredients.length} bahan ke keranjang!`);
-            },
-            onError: () => {
-                showToast('Gagal menambahkan bahan ke keranjang', 'error');
-            }
         });
-    };
-
-    // Toast helper
-    const showToast = (message, type = 'success') => {
-        setToast({ message, type });
-        setTimeout(() => setToast(null), 3000);
     };
 
     return (
         <AppLayout>
             <Head title={`${recipe.title} - Savora`} />
-
-            {/* Toast Notification */}
-            {toast && (
-                <div className="fixed bottom-5 right-5 z-50 animate-bounce">
-                    <div className={`px-6 py-3 rounded-2xl shadow-xl text-white font-semibold text-sm flex items-center gap-2 ${
-                        toast.type === 'error' ? 'bg-tertiary' : 'bg-primary'
-                    }`}>
-                        {toast.type === 'error' ? (
-                            <svg className="w-5 h-5" fill="none" stroke="currentColor" viewBox="0 0 24 24">
-                                <path strokeLinecap="round" strokeLinejoin="round" strokeWidth="2" d="M12 9v2m0 4h.01m-6.938 4h13.856c1.54 0 2.502-1.667 1.732-3L13.732 4c-.77-1.333-2.694-1.333-3.464 0L3.34 16c-.77 1.333.192 3 1.732 3z" />
-                            </svg>
-                        ) : (
-                            <svg className="w-5 h-5" fill="none" stroke="currentColor" viewBox="0 0 24 24">
-                                <path strokeLinecap="round" strokeLinejoin="round" strokeWidth="2" d="M9 12l2 2 4-4m6 2a9 9 0 11-18 0 9 9 0 0118 0z" />
-                            </svg>
-                        )}
-                        <span>{toast.message}</span>
-                    </div>
-                </div>
-            )}
 
             <div className="max-w-7xl mx-auto space-y-8">
                 {/* Back button */}
@@ -397,7 +353,8 @@ export default function Show({ recipe, isSaved, relatedRecipes }) {
                                     {/* CTA: Buy all ingredients */}
                                     <button
                                         onClick={handleBuyIngredients}
-                                        className="w-full bg-gradient-to-br from-primary to-primary-container text-white font-semibold rounded-2xl py-3.5 px-6 hover:shadow-lg active:scale-[0.98] transition-all text-sm flex items-center justify-center gap-2"
+                                        disabled={selectedIngredients.length === 0}
+                                        className="w-full bg-gradient-to-br from-primary to-primary-container text-white font-semibold rounded-2xl py-3.5 px-6 hover:shadow-lg active:scale-[0.98] transition-all text-sm flex items-center justify-center gap-2 disabled:opacity-50 disabled:cursor-not-allowed disabled:hover:shadow-none disabled:active:scale-100"
                                     >
                                         <svg xmlns="http://www.w3.org/2000/svg" className="w-5 h-5" fill="none" viewBox="0 0 24 24" stroke="currentColor">
                                             <path strokeLinecap="round" strokeLinejoin="round" strokeWidth={2} d="M3 3h2l.4 2M7 13h10l4-8H5.4M7 13L5.4 5M7 13l-2.293 2.293c-.63.63-.184 1.707.707 1.707H17m0 0a2 2 0 100 4 2 2 0 000-4zm-8 2a2 2 0 11-4 0 2 2 0 014 0z" />

@@ -8,13 +8,6 @@ export default function Index({ addresses, stats }) {
     const user = props.auth?.user;
     
     const [isAddressModalOpen, setIsAddressModalOpen] = useState(false);
-    const [toast, setToast] = useState(null);
-
-    // Toast helper
-    const showToast = (message, type = 'success') => {
-        setToast({ message, type });
-        setTimeout(() => setToast(null), 3000);
-    };
 
     // Personal Info Form
     const profileForm = useForm({
@@ -50,26 +43,14 @@ export default function Index({ addresses, stats }) {
 
     const handleUpdateProfile = (e) => {
         e.preventDefault();
-        profileForm.post('/profile/update', {
-            onSuccess: () => showToast('Informasi pribadi berhasil diperbarui!'),
-            onError: () => showToast('Gagal memperbarui profil.', 'error'),
-        });
+        profileForm.post('/profile/update');
     };
 
     const handleAvatarChange = (e) => {
         const file = e.target.files[0];
         if (file) {
             avatarForm.setData('avatar', file);
-            
-            // Automatically submit avatar upload on file select
-            const formData = new FormData();
-            formData.append('avatar', file);
-            
-            // We use Inertia post directly for convenience or custom submit
-            avatarForm.post('/profile/avatar', {
-                onSuccess: () => showToast('Foto profil berhasil diunggah!'),
-                onError: () => showToast('Gagal mengunggah foto profil.', 'error'),
-            });
+            avatarForm.post('/profile/avatar');
         }
     };
 
@@ -79,36 +60,13 @@ export default function Index({ addresses, stats }) {
             onSuccess: () => {
                 setIsAddressModalOpen(false);
                 addressForm.reset();
-                showToast('Alamat baru berhasil ditambahkan!');
             },
-            onError: () => {
-                showToast('Gagal menambahkan alamat. Periksa input Anda.', 'error');
-            }
         });
     };
-
-    // Flash Messages
-    useEffect(() => {
-        if (props.flash?.success) {
-            showToast(props.flash.success);
-        }
-        if (props.flash?.error) {
-            showToast(props.flash.error, 'error');
-        }
-    }, [props.flash]);
 
     return (
         <AppLayout>
             <Head title="Profil Saya - Savora" />
-
-            {/* Toast Notification */}
-            {toast && (
-                <div className={`fixed bottom-5 right-5 z-50 px-5 py-3.5 rounded-2xl shadow-xl flex items-center gap-3 animate-fade-in-up text-sm font-semibold transition-all ${
-                    toast.type === 'error' ? 'bg-tertiary text-white' : 'bg-primary text-white'
-                }`}>
-                    <span>{toast.message}</span>
-                </div>
-            )}
 
             <div className="max-w-7xl mx-auto py-8">
                 <ProfileLayout stats={stats}>

@@ -1,9 +1,8 @@
 import React, { useState, useEffect } from 'react';
-import { Head, Link, router, useForm, usePage } from '@inertiajs/react';
+import { Head, Link, router, useForm } from '@inertiajs/react';
 import AppLayout from '@/Layouts/AppLayout';
 
 export default function Payment({ cartItems, addresses, subtotal, snapToken, orderId }) {
-    const { props } = usePage();
     const [selectedAddressId, setSelectedAddressId] = useState(
         addresses.find(addr => addr.is_primary)?.id || addresses[0]?.id || ''
     );
@@ -108,16 +107,6 @@ export default function Payment({ cartItems, addresses, subtotal, snapToken, ord
             }
         }
     }, [snapToken, orderId]);
-
-    // Display flash messages from backend
-    useEffect(() => {
-        if (props.flash?.success) {
-            showToast(props.flash.success);
-        }
-        if (props.flash?.error) {
-            showToast(props.flash.error, 'error');
-        }
-    }, [props.flash]);
 
     const selectedAddress = addresses.find(addr => addr.id === selectedAddressId);
 
