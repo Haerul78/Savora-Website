@@ -1,13 +1,28 @@
 import AppLayout from '@/Layouts/AppLayout';
 import RecipeCard from '@/Components/RecipeCard';
 import Pagination from '@/Components/Pagination';
+import Skeleton from '@/Components/Skeleton';
 import { usePage, router } from '@inertiajs/react';
 import { useState, useEffect, useRef } from 'react';
 
 export default function RecipeIndex() {
     const { recipes, categories, difficulties, filters } = usePage().props;
     const [search, setSearch] = useState(filters.search ?? '');
+    const [loading, setLoading] = useState(false);
     const debounceTimer = useRef(null);
+
+    useEffect(() => {
+        const removeStart = router.on('start', (event) => {
+            if (event.detail.visit.url.pathname === '/recipes') {
+                setLoading(true);
+            }
+        });
+        const removeFinish = router.on('finish', () => setLoading(false));
+        return () => {
+            removeStart();
+            removeFinish();
+        };
+    }, []);
 
     useEffect(() => {
         clearTimeout(debounceTimer.current);
@@ -119,7 +134,17 @@ export default function RecipeIndex() {
                     </div>
 
                     {/* Grid */}
-                    {recipes.data.length > 0 ? (
+                    {loading ? (
+                        <div className="grid grid-cols-2 xl:grid-cols-3 gap-4">
+                            {Array.from({ length: 6 }).map((_, idx) => (
+                                <div key={idx} className="rounded-2xl border border-outline-variant overflow-hidden space-y-3 p-3">
+                                    <Skeleton className="aspect-[4/3] w-full" />
+                                    <Skeleton className="h-4 w-3/4" />
+                                    <Skeleton className="h-3 w-1/2" />
+                                </div>
+                            ))}
+                        </div>
+                    ) : recipes.data.length > 0 ? (
                         <>
                             <div className="grid grid-cols-2 xl:grid-cols-3 gap-4">
                                 {recipes.data.map(recipe => (
