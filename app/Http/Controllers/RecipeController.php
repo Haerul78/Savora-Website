@@ -3,6 +3,7 @@
 namespace App\Http\Controllers;
 
 use App\Models\Recipe;
+use App\Models\SavedRecipe;
 use Inertia\Inertia;
 
 class RecipeController extends Controller
@@ -12,6 +13,11 @@ class RecipeController extends Controller
         $search     = request('search', '');
         $category   = request('category', '');
         $difficulty = request('difficulty', '');
+
+        $userId = $this->currentUserId();
+        $savedRecipeIds = $userId
+            ? SavedRecipe::where('user_id', $userId)->pluck('recipe_id')->flip()
+            : collect();
 
         $recipes = Recipe::where('is_published', true)
             ->when($search, fn ($q) => $q->where('title', 'ilike', "%{$search}%"))
@@ -30,6 +36,7 @@ class RecipeController extends Controller
                 'total_reviews'     => $r->total_reviews,
                 'cook_time_minutes' => $r->cook_time_minutes,
                 'difficulty'        => $r->difficulty,
+                'is_saved'          => $savedRecipeIds->has($r->id),
             ]);
 
         $categories  = Recipe::where('is_published', true)->distinct()->pluck('category')->filter()->values();
@@ -54,22 +61,29 @@ class RecipeController extends Controller
             ])
             ->firstOrFail();
 
-        $user = session('supabase_user');
-        $userId = is_array($user) ? ($user['id'] ?? null) : ($user?->id);
+        $userId = $this->currentUserId();
 
         $isSaved = false;
         if ($userId) {
-            $isSaved = \App\Models\SavedRecipe::where('user_id', $userId)
+            $isSaved = SavedRecipe::where('user_id', $userId)
                 ->where('recipe_id', $recipe->id)
                 ->exists();
         }
+
+        $savedRecipeIds = $userId
+            ? SavedRecipe::where('user_id', $userId)->pluck('recipe_id')->flip()
+            : collect();
 
         $relatedRecipes = Recipe::where('category', $recipe->category)
             ->where('id', '!=', $recipe->id)
             ->where('is_published', true)
             ->orderByDesc('rating')
             ->take(4)
-            ->get(['id', 'title', 'slug', 'category', 'image_url', 'rating', 'total_reviews', 'cook_time_minutes', 'difficulty']);
+            ->get(['id', 'title', 'slug', 'category', 'image_url', 'rating', 'total_reviews', 'cook_time_minutes', 'difficulty'])
+            ->map(function ($r) use ($savedRecipeIds) {
+                $r->is_saved = $savedRecipeIds->has($r->id);
+                return $r;
+            });
 
         return Inertia::render('Recipe/Show', [
             'recipe' => [
@@ -122,5 +136,11 @@ class RecipeController extends Controller
             'isSaved'        => $isSaved,
             'relatedRecipes' => $relatedRecipes,
         ]);
+    }
+
+    private function currentUserId(): ?string
+    {
+        $user = session('supabase_user');
+        return is_array($user) ? ($user['id'] ?? null) : ($user?->id);
     }
 }

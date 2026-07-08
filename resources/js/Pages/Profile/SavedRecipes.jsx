@@ -103,7 +103,7 @@ export default function SavedRecipes({ savedRecipes, stats }) {
                                         </button>
                                         
                                         {/* Recipe Card */}
-                                        {saved.recipe && <RecipeCard recipe={saved.recipe} />}
+                                        {saved.recipe && <RecipeCard recipe={saved.recipe} showBookmark={false} />}
                                     </div>
                                 ))}
                             </div>

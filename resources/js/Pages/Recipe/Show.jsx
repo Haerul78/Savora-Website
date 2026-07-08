@@ -59,7 +59,7 @@ export default function Show({ recipe, isSaved, relatedRecipes }) {
 
     // Handle Bookmark Toggle
     const handleToggleBookmark = () => {
-        router.post(route('recipes.save', recipe.id), {}, {
+        router.post(`/recipes/${recipe.id}/save`, {}, {
             preserveScroll: true,
         });
     };
@@ -72,7 +72,7 @@ export default function Show({ recipe, isSaved, relatedRecipes }) {
             quantity: 1
         }));
 
-        router.post(route('cart.bulk'), { items }, {
+        router.post('/cart/bulk', { items }, {
             preserveScroll: true,
         });
     };
