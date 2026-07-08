@@ -5,7 +5,7 @@ export default function StatusBadge({ status }) {
 
         switch (cleanedStatus) {
             case 'success':
-            case 'paid':
+            case 'confirmed':
             case 'settlement':
             case 'capture':
                 return {

@@ -25,7 +25,7 @@ export default function Success({ order }) {
         });
     };
 
-    const isPaid = order.status === 'paid' || order.payment?.status === 'paid' || order.status === 'confirmed';
+    const isPaid = order.status === 'confirmed' || order.payment?.status === 'success';
     const failedStatuses = ['failed', 'expired', 'cancel', 'cancelled', 'deny'];
     const isFailed = failedStatuses.includes(order.status) || failedStatuses.includes(order.payment?.status);
 

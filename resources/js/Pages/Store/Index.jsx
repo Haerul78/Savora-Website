@@ -104,27 +104,8 @@ export default function Index({ products, categories, filters }) {
             <Head title="Toko Segar Savora" />
 
             <div className="max-w-7xl mx-auto space-y-8">
-                
-                {/* 1. Promo Banner */}
-                <div className="bg-gradient-to-br from-primary to-primary-container rounded-3xl p-8 md:p-12 text-white relative overflow-hidden shadow-lg">
-                    {/* Decorative Background Elements */}
-                    <div className="absolute right-0 bottom-0 opacity-20 w-80 h-80 rounded-full bg-white/20 blur-3xl -mr-16 -mb-16"></div>
-                    <div className="absolute left-1/3 top-0 opacity-10 w-40 h-40 rounded-full bg-white/10 blur-2xl"></div>
 
-                    <div className="max-w-md space-y-4 relative z-10">
-                        <span className="bg-white/20 backdrop-blur-md px-3 py-1 rounded-full text-xs font-semibold uppercase tracking-wider">
-                            Promo Minggu Ini
-                        </span>
-                        <h2 className="text-3xl md:text-4xl font-bold tracking-tight leading-tight">
-                            Bahan Segar Pilihan, Langsung dari Petani
-                        </h2>
-                        <p className="text-white/80 text-sm leading-relaxed">
-                            Nikmati sayuran hidroponik, daging segar kualitas premium, dan bumbu tradisional dengan diskon gratis ongkir flat Rp 10.000 ke seluruh Indonesia.
-                        </p>
-                    </div>
-                </div>
-
-                {/* 2. Category Tabs Slider */}
+                {/* 1. Category Tabs Slider */}
                 <div className="space-y-3">
                     <h3 className="text-lg font-bold text-on-surface">Kategori Bahan</h3>
                     <div className="flex items-center gap-3 overflow-x-auto pb-3 scrollbar-hide -mx-6 px-6 md:mx-0 md:px-0">
@@ -156,7 +137,7 @@ export default function Index({ products, categories, filters }) {
                     </div>
                 </div>
 
-                {/* 3. Filter and Product Grid Main Layout */}
+                {/* 2. Filter and Product Grid Main Layout */}
                 <div className="grid grid-cols-1 lg:grid-cols-12 gap-8 items-start">
                     
                     {/* Left Sidebar Filter Panel (220px equivalent in grid) */}

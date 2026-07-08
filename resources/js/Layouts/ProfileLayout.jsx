@@ -118,22 +118,6 @@ export default function ProfileLayout({ children, stats }) {
 
                     <hr className="my-3 border-surface-low" />
 
-                    {/* Savora Premium Upsell Card */}
-                    <div className="bg-gradient-to-br from-primary/5 to-primary-container/10 border border-primary/10 rounded-2xl p-4 mb-3 text-left">
-                        <h4 className="text-xs font-bold text-primary flex items-center gap-1.5">
-                            👑 Savora Premium
-                        </h4>
-                        <p className="text-[10px] text-on-surface-variant mt-1.5 leading-relaxed">
-                            Nikmati resep eksklusif dan gratis ongkir selamanya dengan berlangganan Savora Premium.
-                        </p>
-                        <button
-                            onClick={() => alert('Savora Premium akan segera hadir!')}
-                            className="mt-3 w-full bg-gradient-to-br from-primary to-primary-container text-white text-[10px] font-bold py-2 rounded-xl hover:opacity-95 transition-opacity"
-                        >
-                            Daftar Sekarang
-                        </button>
-                    </div>
-
                     {/* Logout Button */}
                     <button
                         onClick={handleLogout}

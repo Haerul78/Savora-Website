@@ -106,16 +106,16 @@ class ProfileController extends Controller
             ->orderByDesc('created_at');
 
         if ($status === 'success') {
-            $query->where(fn($q) => 
-                $q->where('status', 'paid')
-                  ->orWhereHas('payment', fn($p) => $p->where('status', 'paid'))
+            $query->where(fn($q) =>
+                $q->where('status', 'confirmed')
+                  ->orWhereHas('payment', fn($p) => $p->where('status', 'success'))
             );
         } elseif ($status === 'pending') {
             $query->where('status', 'pending')
                   ->whereHas('payment', fn($p) => $p->where('status', 'pending'));
         } elseif ($status === 'failed') {
-            $query->where(fn($q) => 
-                $q->where('status', 'failed')
+            $query->where(fn($q) =>
+                $q->where('status', 'cancelled')
                   ->orWhereHas('payment', fn($p) => $p->whereIn('status', ['failed', 'expired', 'cancelled']))
             );
         }

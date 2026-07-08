@@ -209,22 +209,30 @@ class CheckoutController extends Controller
         if ($status === 'settlement') {
             DB::transaction(function () use ($order, $transactionId) {
                 $order->payment->update([
-                    'status'         => 'paid',
+                    'status'         => 'success',
                     'transaction_id' => $transactionId,
                     'paid_at'        => now(),
                 ]);
-                $order->update(['status' => 'paid']);
+                $order->update(['status' => 'confirmed']);
                 $this->decrementStock($order);
                 CartItem::where('user_id', $order->user_id)->delete();
             });
         } elseif ($status === 'pending') {
             $order->payment->update(['status' => 'pending']);
         } elseif (in_array($status, ['deny', 'cancel', 'expire'])) {
+            // Payments punya kolom status yang lebih rinci (failed/cancelled/expired),
+            // sedangkan orders cuma punya "cancelled" untuk semua kegagalan.
+            $paymentStatus = match ($status) {
+                'deny'   => 'failed',
+                'cancel' => 'cancelled',
+                'expire' => 'expired',
+            };
+
             $order->payment->update([
-                'status'         => 'failed',
+                'status'         => $paymentStatus,
                 'failure_reason' => $status,
             ]);
-            $order->update(['status' => 'failed']);
+            $order->update(['status' => 'cancelled']);
         }
     }
 
@@ -243,8 +251,8 @@ class CheckoutController extends Controller
         $this->syncPaymentStatus($order);
         $order->refresh()->load(['items', 'payment']);
 
-        // Clear cart if order is paid or confirmed
-        if (in_array($order->status, ['paid', 'confirmed'])) {
+        // Clear cart if order is confirmed (paid)
+        if ($order->status === 'confirmed') {
             CartItem::where('user_id', $userId)->delete();
         }
 
@@ -324,12 +332,12 @@ class CheckoutController extends Controller
         DB::transaction(function () use ($order, $userId) {
             if ($order->payment) {
                 $order->payment->update([
-                    'status'         => 'paid',
+                    'status'         => 'success',
                     'transaction_id' => 'MOCK-' . strtoupper(Str::random(12)),
                     'paid_at'        => now(),
                 ]);
             }
-            $order->update(['status' => 'paid']);
+            $order->update(['status' => 'confirmed']);
             $this->decrementStock($order);
 
             CartItem::where('user_id', $userId)->delete();
