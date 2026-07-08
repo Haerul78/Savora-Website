@@ -104,6 +104,9 @@ export default function Index({ addresses, stats }) {
                                     <p className="text-[10px] text-on-surface-variant leading-relaxed">
                                         Format: JPG, PNG, GIF. Maks. 2MB.
                                     </p>
+                                    {avatarForm.errors.avatar && (
+                                        <p className="text-[10px] text-tertiary text-center">{avatarForm.errors.avatar}</p>
+                                    )}
                                 </div>
 
                                 {/* Form Fields (Right - 9 Cols) */}

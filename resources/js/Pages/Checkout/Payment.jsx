@@ -276,6 +276,10 @@ export default function Payment({ cartItems, addresses, subtotal, snapToken, ord
                                 </div>
                             )}
 
+                            {checkoutForm.errors.address_id && (
+                                <p className="text-xs text-tertiary mb-3">{checkoutForm.errors.address_id}</p>
+                            )}
+
                             {/* Pay Button */}
                             <button
                                 onClick={handlePlaceOrder}
