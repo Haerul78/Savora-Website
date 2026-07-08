@@ -155,11 +155,24 @@ export default function RecipeIndex() {
                             <Pagination meta={recipes} />
                         </>
                     ) : (
-                        <div className="py-20 text-center space-y-2">
-                            <p className="text-on-surface-variant text-sm">Resep tidak ditemukan.</p>
+                        <div className="text-center py-16 bg-surface-lowest border border-outline-variant rounded-3xl space-y-4">
+                            <div className="w-16 h-16 rounded-2xl bg-surface-high flex items-center justify-center mx-auto text-on-surface-variant text-2xl">
+                                🔍
+                            </div>
+                            <div className="space-y-1">
+                                <h3 className="text-base font-bold text-on-surface">Resep Tidak Ditemukan</h3>
+                                <p className="text-xs text-on-surface-variant max-w-sm mx-auto leading-relaxed">
+                                    {hasFilter
+                                        ? 'Maaf, kami tidak dapat menemukan resep dengan kata kunci atau filter yang Anda gunakan. Coba ubah pencarian Anda.'
+                                        : 'Belum ada resep yang tersedia saat ini.'}
+                                </p>
+                            </div>
                             {hasFilter && (
-                                <button onClick={clearFilters} className="text-sm text-primary hover:underline">
-                                    Hapus filter
+                                <button
+                                    onClick={clearFilters}
+                                    className="bg-primary text-white px-5 py-2.5 rounded-2xl text-xs font-semibold shadow-md hover:bg-primary-container transition"
+                                >
+                                    Hapus Filter
                                 </button>
                             )}
                         </div>
