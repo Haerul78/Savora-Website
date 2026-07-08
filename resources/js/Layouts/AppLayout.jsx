@@ -61,38 +61,42 @@ export default function AppLayout({ children }) {
         <div className="flex min-h-screen bg-surface">
             <Toast />
 
-            {/* Sidebar */}
-            <aside className="fixed top-0 left-0 h-screen w-64 bg-white/70 backdrop-blur-xl border-r border-white/40 shadow-lg flex flex-col z-40">
+            {/* Sidebar — collapses to icon-only below lg (tablet), full width at lg+ */}
+            <aside className="fixed top-0 left-0 h-screen w-20 lg:w-64 bg-white/70 backdrop-blur-xl border-r border-white/40 shadow-lg flex flex-col z-40 transition-all">
                 {/* Logo */}
-                <div className="px-6 py-5 border-b border-white/40">
-                    <Link href="/" className="flex items-center gap-2">
-                        <div className="w-8 h-8 rounded-lg bg-primary flex items-center justify-center">
+                <div className="px-3 lg:px-6 py-5 border-b border-white/40">
+                    <Link href="/" className="flex items-center justify-center lg:justify-start gap-2">
+                        <div className="w-8 h-8 rounded-lg bg-primary flex items-center justify-center shrink-0">
                             <span className="text-white font-bold text-sm">S</span>
                         </div>
-                        <span className="text-xl font-bold text-primary tracking-tight">Savora</span>
+                        <span className="hidden lg:inline text-xl font-bold text-primary tracking-tight">Savora</span>
                     </Link>
                 </div>
 
                 {/* Nav Items */}
-                <nav className="flex-1 px-3 py-4 space-y-1">
+                <nav className="flex-1 px-2 lg:px-3 py-4 space-y-1">
                     {navItems.map((item) => {
                         const active = isActive(item.href);
                         return (
                             <Link
                                 key={item.href}
                                 href={item.href}
-                                className={`flex items-center gap-3 px-3 py-2.5 rounded-xl text-sm font-medium transition-all ${
+                                title={item.label}
+                                className={`relative flex items-center justify-center lg:justify-start gap-3 px-3 py-2.5 rounded-xl text-sm font-medium transition-all ${
                                     active
                                         ? 'bg-secondary-container text-primary'
                                         : 'text-on-surface-variant hover:bg-surface-high hover:text-on-surface'
                                 }`}
                             >
                                 {item.icon}
-                                <span>{item.label}</span>
+                                <span className="hidden lg:inline">{item.label}</span>
                                 {item.label === 'Keranjang' && cartCount > 0 && (
-                                    <span className="ml-auto bg-primary text-white text-xs font-semibold rounded-full w-5 h-5 flex items-center justify-center">
-                                        {cartCount > 9 ? '9+' : cartCount}
-                                    </span>
+                                    <>
+                                        <span className="hidden lg:flex ml-auto bg-primary text-white text-xs font-semibold rounded-full w-5 h-5 items-center justify-center">
+                                            {cartCount > 9 ? '9+' : cartCount}
+                                        </span>
+                                        <span className="lg:hidden absolute top-1.5 right-3 w-2 h-2 bg-primary rounded-full" />
+                                    </>
                                 )}
                             </Link>
                         );
@@ -101,18 +105,18 @@ export default function AppLayout({ children }) {
 
                 {/* User Info */}
                 {user && (
-                    <div className="px-3 py-4 border-t border-white/40">
-                        <div className="flex items-center gap-3 px-3 py-2">
+                    <div className="px-2 lg:px-3 py-4 border-t border-white/40">
+                        <div className="flex items-center justify-center lg:justify-start gap-3 px-1 lg:px-2 py-2">
                             {user.avatar_url ? (
-                                <img src={user.avatar_url} alt={user.full_name} className="w-8 h-8 rounded-full object-cover" />
+                                <img src={user.avatar_url} alt={user.full_name} className="w-8 h-8 rounded-full object-cover shrink-0" />
                             ) : (
-                                <div className="w-8 h-8 rounded-full bg-secondary-container flex items-center justify-center">
+                                <div className="w-8 h-8 rounded-full bg-secondary-container flex items-center justify-center shrink-0">
                                     <span className="text-primary text-sm font-semibold">
                                         {user.full_name?.[0]?.toUpperCase()}
                                     </span>
                                 </div>
                             )}
-                            <div className="flex-1 min-w-0">
+                            <div className="hidden lg:block flex-1 min-w-0">
                                 <p className="text-sm font-medium text-on-surface truncate">{user.full_name}</p>
                                 <p className="text-xs text-on-surface-variant truncate">{user.email}</p>
                             </div>
@@ -122,10 +126,10 @@ export default function AppLayout({ children }) {
             </aside>
 
             {/* Main Area */}
-            <div className="flex-1 ml-64 flex flex-col">
+            <div className="flex-1 ml-20 lg:ml-64 flex flex-col">
                 {/* Navbar */}
                 <header className="sticky top-0 z-30 bg-white/70 backdrop-blur-xl border-b border-white/40 shadow-sm">
-                    <div className="flex items-center gap-4 px-6 h-16">
+                    <div className="flex items-center gap-4 px-4 lg:px-6 h-16">
                         {/* Search */}
                         <div className="flex-1 max-w-md">
                             <div className="relative">
@@ -168,7 +172,7 @@ export default function AppLayout({ children }) {
                 </header>
 
                 {/* Page Content */}
-                <main className="flex-1 p-6">
+                <main className="flex-1 p-4 lg:p-6">
                     {children}
                 </main>
             </div>

@@ -47,7 +47,7 @@ export default function Home() {
                         </Link>
                     </div>
                     {filteredRecipes.length > 0 ? (
-                        <div className="grid grid-cols-2 xl:grid-cols-4 gap-4">
+                        <div className="grid grid-cols-2 md:grid-cols-3 xl:grid-cols-4 gap-4">
                             {filteredRecipes.map(recipe => (
                                 <RecipeCard key={recipe.id} recipe={recipe} />
                             ))}
@@ -70,7 +70,7 @@ export default function Home() {
                         </Link>
                     </div>
                     {products.length > 0 ? (
-                        <div className="grid grid-cols-2 xl:grid-cols-4 gap-4">
+                        <div className="grid grid-cols-2 md:grid-cols-3 xl:grid-cols-4 gap-4">
                             {products.map(product => (
                                 <ProductCard key={product.id} product={product} />
                             ))}
