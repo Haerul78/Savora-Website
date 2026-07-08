@@ -1,0 +1,87 @@
+import AppLayout from '@/Layouts/AppLayout';
+import CategoryChips from '@/Components/CategoryChips';
+import RecipeCard from '@/Components/RecipeCard';
+import ProductCard from '@/Components/ProductCard';
+import { usePage, Link, Head } from '@inertiajs/react';
+import { useState } from 'react';
+
+export default function Home() {
+    const { auth, recipes, categories, products } = usePage().props;
+    const [activeCategory, setActiveCategory] = useState(null);
+
+    const filteredRecipes = activeCategory
+        ? recipes.filter(r => r.category === activeCategory)
+        : recipes;
+
+    return (
+        <AppLayout>
+            <Head title="Beranda - Savora" />
+
+            <div className="space-y-10 pb-10">
+                {/* Greeting */}
+                <section>
+                    <h1 className="text-2xl font-bold text-on-surface">
+                        Halo, {auth.user?.fullName ?? 'User'} 👋
+                    </h1>
+                    <p className="text-sm text-on-surface-variant mt-1">
+                        Mau masak apa hari ini?
+                    </p>
+                </section>
+
+                {/* Category Chips */}
+                <section className="space-y-3">
+                    <h2 className="text-base font-semibold text-on-surface">Kategori</h2>
+                    <CategoryChips
+                        categories={categories}
+                        active={activeCategory}
+                        onChange={setActiveCategory}
+                    />
+                </section>
+
+                {/* Rekomendasi Resep */}
+                <section className="space-y-4">
+                    <div className="flex items-center justify-between">
+                        <h2 className="text-base font-semibold text-on-surface">Rekomendasi Resep</h2>
+                        <Link href="/recipes" className="text-sm text-primary font-medium hover:underline">
+                            Lihat semua
+                        </Link>
+                    </div>
+                    {filteredRecipes.length > 0 ? (
+                        <div className="grid grid-cols-2 md:grid-cols-3 xl:grid-cols-4 gap-4">
+                            {filteredRecipes.map(recipe => (
+                                <RecipeCard key={recipe.id} recipe={recipe} />
+                            ))}
+                        </div>
+                    ) : (
+                        <p className="text-sm text-on-surface-variant py-10 text-center">
+                            Belum ada resep untuk kategori ini.
+                        </p>
+                    )}
+                </section>
+
+                <hr className="border-outline-variant" />
+
+                {/* Bahan Segar */}
+                <section className="space-y-4">
+                    <div className="flex items-center justify-between">
+                        <h2 className="text-base font-semibold text-on-surface">Bahan Segar</h2>
+                        <Link href="/store" className="text-sm text-primary font-medium hover:underline">
+                            Lihat toko
+                        </Link>
+                    </div>
+                    {products.length > 0 ? (
+                        <div className="grid grid-cols-2 md:grid-cols-3 xl:grid-cols-4 gap-4">
+                            {products.map(product => (
+                                <ProductCard key={product.id} product={product} />
+                            ))}
+                        </div>
+                    ) : (
+                        <p className="text-sm text-on-surface-variant py-10 text-center">
+                            Belum ada produk tersedia.
+                        </p>
+                    )}
+                </section>
+            </div>
+        </AppLayout>
+    );
+}
