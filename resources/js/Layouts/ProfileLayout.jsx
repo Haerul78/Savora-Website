@@ -1,4 +1,3 @@
-import React from 'react';
 import { Link, usePage, router } from '@inertiajs/react';
 
 export default function ProfileLayout({ children, stats }) {

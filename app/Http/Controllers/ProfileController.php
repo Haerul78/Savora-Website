@@ -3,14 +3,11 @@
 namespace App\Http\Controllers;
 
 use App\Models\Address;
-use App\Models\CartItem;
 use App\Models\Order;
-use App\Models\Payment;
 use App\Models\Review;
 use App\Models\SavedRecipe;
 use App\Models\User;
 use Illuminate\Http\Request;
-use Illuminate\Support\Facades\DB;
 use Illuminate\Support\Facades\Storage;
 use Illuminate\Support\Str;
 use Inertia\Inertia;
