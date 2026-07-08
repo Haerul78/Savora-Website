@@ -71,6 +71,14 @@ export default function PaymentHistory({ payments, statusFilter, stats }) {
         });
     };
 
+    const handleCheckStatus = (orderId) => {
+        setProcessingId(orderId);
+        router.post(`/checkout/${orderId}/check-status`, {}, {
+            preserveScroll: true,
+            onFinish: () => setProcessingId(null),
+        });
+    };
+
     const handlePageChange = (url) => {
         if (url) router.get(url, {}, { preserveState: true });
     };
@@ -189,14 +197,25 @@ export default function PaymentHistory({ payments, statusFilter, stats }) {
                                                     <p className="text-sm font-bold text-primary">{formatRupiah(order.total)}</p>
                                                 </div>
 
-                                                {isPending && order.payment?.midtrans_token && (
-                                                    <button
-                                                        onClick={() => handlePayNow(order.payment.midtrans_token, order.id)}
-                                                        disabled={processingId === order.id}
-                                                        className="bg-primary hover:opacity-90 text-white text-xs font-semibold px-4 py-2.5 rounded-xl transition disabled:opacity-50"
-                                                    >
-                                                        {processingId === order.id ? 'Memuat...' : 'Bayar Sekarang'}
-                                                    </button>
+                                                {isPending && (
+                                                    <div className="flex items-center gap-2">
+                                                        <button
+                                                            onClick={() => handleCheckStatus(order.id)}
+                                                            disabled={processingId === order.id}
+                                                            className="bg-surface-low hover:bg-surface-high text-on-surface text-xs font-semibold px-4 py-2.5 rounded-xl transition disabled:opacity-50"
+                                                        >
+                                                            {processingId === order.id ? 'Mengecek...' : 'Cek Status'}
+                                                        </button>
+                                                        {order.payment?.midtrans_token && (
+                                                            <button
+                                                                onClick={() => handlePayNow(order.payment.midtrans_token, order.id)}
+                                                                disabled={processingId === order.id}
+                                                                className="bg-primary hover:opacity-90 text-white text-xs font-semibold px-4 py-2.5 rounded-xl transition disabled:opacity-50"
+                                                            >
+                                                                {processingId === order.id ? 'Memuat...' : 'Bayar Sekarang'}
+                                                            </button>
+                                                        )}
+                                                    </div>
                                                 )}
                                             </div>
                                         </div>

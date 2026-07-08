@@ -14,6 +14,7 @@ use Illuminate\Support\Str;
 use Inertia\Inertia;
 use Midtrans\Config as MidtransConfig;
 use Midtrans\Snap;
+use Midtrans\Transaction;
 
 class CheckoutController extends Controller
 {
@@ -23,6 +24,18 @@ class CheckoutController extends Controller
         MidtransConfig::$isProduction = config('midtrans.is_production');
         MidtransConfig::$isSanitized = config('midtrans.is_sanitized');
         MidtransConfig::$is3ds = config('midtrans.is_3ds');
+
+        // Nonaktifkan verifikasi SSL cURL khusus local dev (Windows sering tidak
+        // punya CA bundle terpasang), sama seperti perlakuan SupabaseService.
+        // CURLOPT_HTTPHEADER wajib diisi non-kosong di sini karena Midtrans SDK
+        // mengganti seluruh header asli (termasuk Authorization) jika key ini kosong.
+        if (app()->environment('local')) {
+            MidtransConfig::$curlOptions = [
+                CURLOPT_SSL_VERIFYPEER => false,
+                CURLOPT_SSL_VERIFYHOST => 0,
+                CURLOPT_HTTPHEADER      => ['X-Requested-With: XMLHttpRequest'],
+            ];
+        }
     }
 
     public function payment(Request $request)
@@ -109,6 +122,11 @@ class CheckoutController extends Controller
                 'first_name' => $address->recipient_name,
                 'phone'      => $address->phone,
             ],
+            // Redirect per-transaksi ini tidak divalidasi Midtrans seperti
+            // Finish/Error URL global di Snap Preferences, jadi localhost aman dipakai di sini.
+            'callbacks' => [
+                'finish' => route('checkout.success', ['order_id' => $order->id]),
+            ],
         ]);
 
         Payment::create([
@@ -137,18 +155,62 @@ class CheckoutController extends Controller
             return response()->json(['message' => 'Order not found'], 404);
         }
 
-        $status = $notification->transaction_status;
-        $fraud = $notification->fraud_status ?? null;
+        $this->applyTransactionStatus(
+            $order,
+            $notification->transaction_status,
+            $notification->fraud_status ?? null,
+            $notification->transaction_id ?? null
+        );
 
+        return response()->json(['message' => 'OK']);
+    }
+
+    // Dipanggil dari halaman sukses & tombol "Cek Status" — tanya langsung ke
+    // Midtrans API (outbound), jadi tidak bergantung pada webhook yang butuh
+    // server bisa diakses publik (cocok untuk dev di localhost).
+    public function checkStatus(Request $request, Order $order)
+    {
+        abort_unless($order->user_id === $this->currentUserId(), 403);
+
+        $order->load('payment');
+        $this->syncPaymentStatus($order);
+
+        return back()->with('success', 'Status pembayaran diperbarui.');
+    }
+
+    private function syncPaymentStatus(Order $order): void
+    {
+        $order->loadMissing('payment');
+
+        if (!$order->payment || $order->payment->status !== 'pending') {
+            return;
+        }
+
+        try {
+            $result = Transaction::status($order->order_number);
+        } catch (\Exception $e) {
+            return;
+        }
+
+        $this->applyTransactionStatus(
+            $order,
+            $result->transaction_status,
+            $result->fraud_status ?? null,
+            $result->transaction_id ?? null
+        );
+    }
+
+    private function applyTransactionStatus(Order $order, string $status, ?string $fraud, ?string $transactionId): void
+    {
         if ($status === 'capture' && $fraud === 'accept') {
             $status = 'settlement';
         }
 
         if ($status === 'settlement') {
-            DB::transaction(function () use ($order, $notification) {
+            DB::transaction(function () use ($order, $transactionId) {
                 $order->payment->update([
                     'status'         => 'paid',
-                    'transaction_id' => $notification->transaction_id,
+                    'transaction_id' => $transactionId,
                     'paid_at'        => now(),
                 ]);
                 $order->update(['status' => 'paid']);
@@ -164,16 +226,22 @@ class CheckoutController extends Controller
             ]);
             $order->update(['status' => 'failed']);
         }
-
-        return response()->json(['message' => 'OK']);
     }
 
     public function success(Request $request)
     {
         $userId = $this->currentUserId();
+        $orderId = $request->query('order_id');
+
+        // Midtrans redirect (Finish Redirect URL) mengirim order_number
+        // (mis. ORD-XXXX), sedangkan link internal kita pakai UUID order.
         $order = Order::where('user_id', $userId)
+            ->where(fn ($query) => $query->where('id', $orderId)->orWhere('order_number', $orderId))
             ->with(['items', 'payment'])
-            ->findOrFail($request->query('order_id'));
+            ->firstOrFail();
+
+        $this->syncPaymentStatus($order);
+        $order->refresh()->load(['items', 'payment']);
 
         // Clear cart if order is paid or confirmed
         if (in_array($order->status, ['paid', 'confirmed'])) {

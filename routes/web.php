@@ -53,6 +53,7 @@ Route::middleware('supabase.auth')->group(function () {
     Route::post('/checkout/process', [CheckoutController::class, 'process'])->name('checkout.process');
     Route::get('/checkout/success', [CheckoutController::class, 'success'])->name('checkout.success');
     Route::post('/checkout/mock-pay', [CheckoutController::class, 'mockPay'])->name('checkout.mock-pay');
+    Route::post('/checkout/{order}/check-status', [CheckoutController::class, 'checkStatus'])->name('checkout.check-status');
 
     // Alamat
     Route::post('/addresses', [CheckoutController::class, 'storeAddress'])->name('addresses.store');
