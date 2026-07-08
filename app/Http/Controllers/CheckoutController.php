@@ -7,6 +7,7 @@ use App\Models\CartItem;
 use App\Models\Order;
 use App\Models\OrderItem;
 use App\Models\Payment;
+use App\Models\Product;
 use Illuminate\Http\Request;
 use Illuminate\Support\Facades\DB;
 use Illuminate\Support\Str;
@@ -144,13 +145,16 @@ class CheckoutController extends Controller
         }
 
         if ($status === 'settlement') {
-            $order->payment->update([
-                'status'         => 'paid',
-                'transaction_id' => $notification->transaction_id,
-                'paid_at'        => now(),
-            ]);
-            $order->update(['status' => 'paid']);
-            CartItem::where('user_id', $order->user_id)->delete();
+            DB::transaction(function () use ($order, $notification) {
+                $order->payment->update([
+                    'status'         => 'paid',
+                    'transaction_id' => $notification->transaction_id,
+                    'paid_at'        => now(),
+                ]);
+                $order->update(['status' => 'paid']);
+                $this->decrementStock($order);
+                CartItem::where('user_id', $order->user_id)->delete();
+            });
         } elseif ($status === 'pending') {
             $order->payment->update(['status' => 'pending']);
         } elseif (in_array($status, ['deny', 'cancel', 'expire'])) {
@@ -185,6 +189,15 @@ class CheckoutController extends Controller
     {
         $user = session('supabase_user');
         return is_array($user) ? ($user['id'] ?? null) : ($user?->id);
+    }
+
+    private function decrementStock(Order $order): void
+    {
+        $order->loadMissing('items');
+
+        foreach ($order->items as $item) {
+            Product::where('id', $item->product_id)->decrement('stock', $item->quantity);
+        }
     }
 
     public function storeAddress(Request $request)
@@ -249,6 +262,7 @@ class CheckoutController extends Controller
                 ]);
             }
             $order->update(['status' => 'paid']);
+            $this->decrementStock($order);
 
             CartItem::where('user_id', $userId)->delete();
         });
