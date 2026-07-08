@@ -21,22 +21,25 @@ Route::middleware('supabase.guest')->group(function () {
     Route::post('/login', [AuthController::class, 'login']);
     Route::get('/register', [AuthController::class, 'showRegister'])->name('register');
     Route::post('/register', [AuthController::class, 'register']);
+
+    // Google OAuth via Supabase
+    Route::get('/auth/google', [AuthController::class, 'redirectToGoogle'])->name('auth.google');
+    Route::get('/auth/google/callback', [AuthController::class, 'showGoogleCallback'])->name('auth.google.callback');
+    Route::post('/auth/google/session', [AuthController::class, 'googleSession'])->name('auth.google.session');
 });
 
-// ─── Protected routes (butuh login via Supabase) ──────────────────────────────
+// ─── Public browsing (tidak perlu login untuk melihat-lihat) ──────────────────
+Route::get('/', [HomeController::class, 'index'])->name('home');
+Route::get('/recipes', [RecipeController::class, 'index'])->name('recipes.index');
+Route::get('/recipes/{slug}', [RecipeController::class, 'show'])->name('recipes.show');
+Route::get('/store', [StoreController::class, 'index'])->name('store.index');
+
+// ─── Protected routes (butuh login via Supabase — khusus aksi transaksi) ──────
 Route::middleware('supabase.auth')->group(function () {
     Route::post('/logout', [AuthController::class, 'logout'])->name('logout');
 
-    // Home
-    Route::get('/', [HomeController::class, 'index'])->name('home');
-
-    // Resep
-    Route::get('/recipes', [RecipeController::class, 'index'])->name('recipes.index');
-    Route::get('/recipes/{slug}', [RecipeController::class, 'show'])->name('recipes.show');
+    // Resep (aksi yang butuh akun)
     Route::post('/recipes/{recipe}/save', [SavedRecipeController::class, 'toggle'])->name('recipes.save');
-
-    // Toko
-    Route::get('/store', [StoreController::class, 'index'])->name('store.index');
 
     // Keranjang
     Route::get('/cart', [CartController::class, 'index'])->name('cart.index');

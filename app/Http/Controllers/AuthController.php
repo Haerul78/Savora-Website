@@ -93,6 +93,52 @@ class AuthController extends Controller
             ->with('flash', ['success' => 'Akun berhasil dibuat! Silakan login.']);
     }
 
+    public function redirectToGoogle()
+    {
+        $redirectTo = url('/auth/google/callback');
+
+        return redirect(
+            config('supabase.url') . '/auth/v1/authorize?provider=google&redirect_to=' . urlencode($redirectTo)
+        );
+    }
+
+    public function showGoogleCallback()
+    {
+        return Inertia::render('Auth/GoogleCallback');
+    }
+
+    public function googleSession(Request $request)
+    {
+        $request->validate([
+            'access_token' => 'required|string',
+        ]);
+
+        $authUser = $this->supabase->getUser($request->access_token);
+
+        if (isset($authUser['error']) || !isset($authUser['id'])) {
+            return redirect()->route('login')->withErrors(['email' => 'Login dengan Google gagal. Silakan coba lagi.']);
+        }
+
+        $metadata = $authUser['user_metadata'] ?? [];
+
+        $user = User::firstOrCreate(
+            ['id' => $authUser['id']],
+            [
+                'full_name'  => $metadata['full_name'] ?? $metadata['name'] ?? ($authUser['email'] ?? 'Pengguna Savora'),
+                'email'      => $authUser['email'] ?? '',
+                'avatar_url' => $metadata['avatar_url'] ?? $metadata['picture'] ?? null,
+                'role'       => 'user',
+            ]
+        );
+
+        session([
+            'supabase_access_token' => $request->access_token,
+            'supabase_user'         => $user,
+        ]);
+
+        return redirect('/');
+    }
+
     public function logout(Request $request)
     {
         $token = session('supabase_access_token');
